@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Monitoramento - {{ fonte.nome }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Monitoramento - {{ fonte.nome }}</h1>
+    <hr>
+    <h3>Informações da Fonte</h3>
+    <ul>
+        <li><strong>Localização:</strong> {{ fonte.localizacao }}</li>
+        <li><strong>Capacidade:</strong> {{ fonte.capacidade }} kWp</li>
+        <li><strong>Marca/Modelo:</strong> {{ fonte.marca }} {{ fonte.modelo }}</li>
+        <li><strong>Data de Instalação:</strong> {{ fonte.data_instalacao }}</li>
+    </ul>
+    <h3 class="mt-4">Status de Performance</h3>
+    <p><strong>Status:</strong> <span class="performance-status {{ analise.performance_status }}">{{ analise.performance_status|title }}</span></p>
+    <p><strong>Última análise:</strong> {{ analise.ultima_atualizacao or 'N/A' }}</p>
+    <h3 class="mt-4">Alertas</h3>
+    {% if alertas %}
+        <ul>
+        {% for alerta in alertas %}
+            <li>
+                <strong>{{ alerta.tipo|title }}:</strong> {{ alerta.mensagem }}<br>
+                <small>Detectado em {{ alerta.data_criacao }}</small>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhum alerta ativo.</p>
+    {% endif %}
+</div>
+{% endblock %} 
