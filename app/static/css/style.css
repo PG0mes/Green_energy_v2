@@ -1,8 +1,8 @@
 /* Variáveis de cores */
 :root {
-    --primary-color: #005eff;      /* Azul claro - cor principal */
-    --primary-dark: #0046c2;       /* Azul escuro para hover */
-    --primary-light: #4d8bff;      /* Azul claro para elementos secundários */
+    --primary-color: #28a745;      /* Verde principal */
+    --primary-dark: #218838;       /* Verde escuro para hover */
+    --primary-light: #43c06d;      /* Verde claro para elementos secundários */
     --accent-color: #3cd4a0;       /* Cor de destaque */
     --text-dark: #333333;          /* Texto escuro */
     --text-light: #ffffff;         /* Texto claro */
@@ -167,7 +167,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .alert-info {
-    background-color: rgba(44, 93, 229, 0.1);
-    border-color: rgba(44, 93, 229, 0.2);
+    background-color: rgba(40, 167, 69, 0.1);
+    border-color: rgba(40, 167, 69, 0.2);
     color: var(--primary-dark);
 }

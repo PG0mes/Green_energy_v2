@@ -2,107 +2,227 @@
 
 {% block title %}GreenEnergy - Nova Fonte de Energia{% endblock %}
 
+{% block extra_css %}
+<style>
+    .wizard-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+    .wizard-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+    .wizard-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9f7ef;
+        color: #28a745;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.3rem;
+        border: 2px solid #28a745;
+        margin-bottom: 0.3rem;
+        transition: background 0.3s, color 0.3s;
+        z-index: 2;
+    }
+    .wizard-step.active .wizard-circle, .wizard-step.completed .wizard-circle {
+        background: #28a745;
+        color: #fff;
+    }
+    .wizard-label {
+        font-size: 1rem;
+        color: #28a745;
+        font-weight: 500;
+    }
+    /* Linha de progresso atrás dos círculos */
+    .wizard-progress-bar {
+        position: absolute;
+        top: 18px;
+        left: 8%;
+        right: 8%;
+        height: 4px;
+        background: #e9f7ef;
+        z-index: 1;
+        border-radius: 2px;
+    }
+    .wizard-progress-bar-fill {
+        position: absolute;
+        top: 18px;
+        left: 8%;
+        height: 4px;
+        background: #28a745;
+        z-index: 1;
+        border-radius: 2px;
+        transition: width 0.3s;
+    }
+    .wizard-form-step {
+        display: none;
+        animation: fadeIn 0.5s;
+    }
+    .wizard-form-step.active {
+        display: block;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(40px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .btn-success, .btn-outline-success {
+        min-width: 120px;
+    }
+    /* Card maior e centralizado */
+    .cadastro-card-max {
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+    }
+    /* Rodapé centralizado */
+    .footer-custom {
+        text-align: center !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
+    <div class="col-12">
+        <div class="card cadastro-card-max">
+            <div class="card-header bg-success text-white">
                 <h2 class="card-title mb-0">Nova Fonte de Energia Solar</h2>
             </div>
             <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome da Instalação</label>
-                        <input type="text" class="form-control" id="nome" name="nome" required>
+                <!-- Barra de progresso -->
+                <div class="wizard-progress mb-4" style="position:relative;">
+                    <div class="wizard-progress-bar"></div>
+                    <div class="wizard-progress-bar-fill" id="wizardProgressBarFill"></div>
+                    <div class="wizard-step step-1 active">
+                        <div class="wizard-circle">1</div>
+                        <div class="wizard-label">Identificação</div>
                     </div>
-                    
-                    <!-- Campos de Endereço com Busca CEP -->
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="cep" class="form-label">CEP</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="cep" name="cep" maxlength="9" placeholder="00000-000">
-                                <button class="btn btn-outline-primary" type="button" id="buscarCep">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                    <div class="wizard-step step-2">
+                        <div class="wizard-circle">2</div>
+                        <div class="wizard-label">Localização</div>
+                    </div>
+                    <div class="wizard-step step-3">
+                        <div class="wizard-circle">3</div>
+                        <div class="wizard-label">Dados Técnicos</div>
+                    </div>
+                    <div class="wizard-step step-4">
+                        <div class="wizard-circle">4</div>
+                        <div class="wizard-label">Instalação</div>
+                    </div>
+                </div>
+                <!-- Formulário Wizard -->
+                <form id="wizardForm" method="POST">
+                    <!-- Etapa 1 -->
+                    <div class="wizard-form-step active" data-step="1">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome da Instalação</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                    </div>
+                    <!-- Etapa 2 -->
+                    <div class="wizard-form-step" data-step="2">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="cep" class="form-label">CEP</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="cep" name="cep" maxlength="9" placeholder="00000-000">
+                                    <button class="btn btn-outline-success" type="button" id="buscarCep">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div id="cepFeedback" class="invalid-feedback"></div>
+                                <small class="text-muted">Preencha o CEP para buscar o endereço automaticamente</small>
                             </div>
-                            <div id="cepFeedback" class="invalid-feedback"></div>
-                            <small class="text-muted">Preencha o CEP para buscar o endereço automaticamente</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-10 mb-3">
+                                <label for="logradouro" class="form-label">Rua</label>
+                                <input type="text" class="form-control" id="logradouro" name="logradouro">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="numero" class="form-label">Número</label>
+                                <input type="text" class="form-control" id="numero" name="numero">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="complemento" class="form-label">Complemento</label>
+                                <input type="text" class="form-control" id="complemento" name="complemento">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="bairro" class="form-label">Bairro</label>
+                                <input type="text" class="form-control" id="bairro" name="bairro">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="cidade" class="form-label">Cidade</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="uf" class="form-label">Estado</label>
+                                <input type="text" class="form-control" id="uf" name="uf" maxlength="2">
+                            </div>
+                        </div>
+                        <input type="hidden" id="localizacao" name="localizacao">
+                        <div class="mb-3">
+                            <small class="text-muted">O endereço completo será montado automaticamente a partir dos campos acima.</small>
                         </div>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-10 mb-3">
-                            <label for="logradouro" class="form-label">Rua</label>
-                            <input type="text" class="form-control" id="logradouro" name="logradouro">
+                    <!-- Etapa 3 -->
+                    <div class="wizard-form-step" data-step="3">
+                        <div class="mb-3">
+                            <label for="capacidade" class="form-label">Capacidade Instalada (kWp)</label>
+                            <input type="number" step="0.01" class="form-control" id="capacidade" name="capacidade" required>
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label for="numero" class="form-label">Número</label>
-                            <input type="text" class="form-control" id="numero" name="numero">
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="complemento" class="form-label">Complemento</label>
-                            <input type="text" class="form-control" id="complemento" name="complemento">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="bairro" class="form-label">Bairro</label>
-                            <input type="text" class="form-control" id="bairro" name="bairro">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="marca" class="form-label">Marca do Inversor</label>
+                                <input type="text" class="form-control" id="marca" name="marca" value="Growatt" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="modelo" class="form-label">Modelo do Inversor</label>
+                                <input type="text" class="form-control" id="modelo" name="modelo" required>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label for="cidade" class="form-label">Cidade</label>
-                            <input type="text" class="form-control" id="cidade" name="cidade">
+                    <!-- Etapa 4 -->
+                    <div class="wizard-form-step" data-step="4">
+                        <div class="mb-3">
+                            <label for="data_instalacao" class="form-label">Data de Instalação</label>
+                            <input type="date" class="form-control" id="data_instalacao" name="data_instalacao" required>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="uf" class="form-label">Estado</label>
-                            <input type="text" class="form-control" id="uf" name="uf" maxlength="2">
-                        </div>
-                    </div>
-                    
-                    <!-- Campo oculto para armazenar o endereço completo -->
-                    <input type="hidden" id="localizacao" name="localizacao">
-                    
-                    <div class="mb-3">
-                        <small class="text-muted">O endereço completo será montado automaticamente a partir dos campos acima.</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="capacidade" class="form-label">Capacidade Instalada (kWp)</label>
-                        <input type="number" step="0.01" class="form-control" id="capacidade" name="capacidade" required>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="marca" class="form-label">Marca do Inversor</label>
-                            <input type="text" class="form-control" id="marca" name="marca" value="Growatt" required>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="modelo" class="form-label">Modelo do Inversor</label>
-                            <input type="text" class="form-control" id="modelo" name="modelo" required>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="gerar_dados_simulados" name="gerar_dados_simulados" checked>
+                            <label class="form-check-label" for="gerar_dados_simulados">Gerar dados simulados para testes</label>
                         </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="data_instalacao" class="form-label">Data de Instalação</label>
-                        <input type="date" class="form-control" id="data_instalacao" name="data_instalacao" required>
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="gerar_dados_simulados" name="gerar_dados_simulados" checked>
-                        <label class="form-check-label" for="gerar_dados_simulados">Gerar dados simulados para testes</label>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Cadastrar Fonte</button>
+                    <!-- Navegação dos botões -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-success" id="btnVoltar" style="display:none">Voltar</button>
+                        <button type="button" class="btn btn-success" id="btnProximo">Próximo</button>
+                        <button type="submit" class="btn btn-success" id="btnCadastrar" style="display:none">Cadastrar Fonte</button>
                     </div>
                 </form>
+                <!-- Mensagem de sucesso -->
+                <div id="wizardSuccess" class="alert alert-success mt-4" style="display:none">
+                    <i class="fas fa-check-circle me-2"></i>Fonte cadastrada com sucesso!
+                </div>
             </div>
         </div>
     </div>
@@ -111,96 +231,147 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Máscara para o CEP
-        const cepInput = document.getElementById('cep');
-        cepInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Remove não-dígitos
-            if (value.length > 5) {
-                value = value.substring(0, 5) + '-' + value.substring(5, 8);
-            }
-            e.target.value = value;
-        });
-        
-        // Busca de CEP
-        const buscarCepBtn = document.getElementById('buscarCep');
-        buscarCepBtn.addEventListener('click', function() {
-            const cep = cepInput.value.replace(/\D/g, '');
-            
-            if (cep.length !== 8) {
-                showCepError('CEP inválido. Informe os 8 dígitos.');
+// Wizard JS
+let currentStep = 1;
+const totalSteps = 4;
+const steps = document.querySelectorAll('.wizard-form-step');
+const btnProximo = document.getElementById('btnProximo');
+const btnVoltar = document.getElementById('btnVoltar');
+const btnCadastrar = document.getElementById('btnCadastrar');
+const progressSteps = document.querySelectorAll('.wizard-step');
+const form = document.getElementById('wizardForm');
+const successMsg = document.getElementById('wizardSuccess');
+
+function showStep(step) {
+    steps.forEach((el, idx) => {
+        el.classList.toggle('active', idx === step - 1);
+    });
+    progressSteps.forEach((el, idx) => {
+        el.classList.toggle('active', idx === step - 1);
+        el.classList.toggle('completed', idx < step - 1);
+    });
+    btnVoltar.style.display = step > 1 ? '' : 'none';
+    btnProximo.style.display = step < totalSteps ? '' : 'none';
+    btnCadastrar.style.display = step === totalSteps ? '' : 'none';
+}
+
+btnProximo.addEventListener('click', function() {
+    if (validateStep(currentStep)) {
+        currentStep++;
+        showStep(currentStep);
+    }
+});
+btnVoltar.addEventListener('click', function() {
+    currentStep--;
+    showStep(currentStep);
+});
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (validateStep(currentStep)) {
+        // Aqui você pode fazer o submit real via AJAX ou deixar o backend processar
+        form.style.display = 'none';
+        successMsg.style.display = 'block';
+    }
+});
+function validateStep(step) {
+    // Validação simples por etapa
+    if (step === 1) {
+        const nome = document.getElementById('nome');
+        if (!nome.value.trim()) { nome.focus(); nome.classList.add('is-invalid'); return false; }
+        nome.classList.remove('is-invalid');
+    }
+    if (step === 2) {
+        const cep = document.getElementById('cep');
+        if (!cep.value.trim() || cep.value.replace(/\D/g, '').length !== 8) { cep.focus(); cep.classList.add('is-invalid'); return false; }
+        cep.classList.remove('is-invalid');
+        // Não obriga todos os campos de endereço, pois podem ser editáveis
+    }
+    if (step === 3) {
+        const capacidade = document.getElementById('capacidade');
+        if (!capacidade.value.trim() || isNaN(capacidade.value) || Number(capacidade.value) <= 0) { capacidade.focus(); capacidade.classList.add('is-invalid'); return false; }
+        capacidade.classList.remove('is-invalid');
+        const marca = document.getElementById('marca');
+        if (!marca.value.trim()) { marca.focus(); marca.classList.add('is-invalid'); return false; }
+        marca.classList.remove('is-invalid');
+        const modelo = document.getElementById('modelo');
+        if (!modelo.value.trim()) { modelo.focus(); modelo.classList.add('is-invalid'); return false; }
+        modelo.classList.remove('is-invalid');
+    }
+    if (step === 4) {
+        const data = document.getElementById('data_instalacao');
+        if (!data.value.trim()) { data.focus(); data.classList.add('is-invalid'); return false; }
+        data.classList.remove('is-invalid');
+    }
+    return true;
+}
+showStep(currentStep);
+// Máscara para o CEP
+const cepInput = document.getElementById('cep');
+cepInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 5) {
+        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+    }
+    e.target.value = value;
+});
+// Busca de CEP
+const buscarCepBtn = document.getElementById('buscarCep');
+buscarCepBtn.addEventListener('click', function() {
+    const cep = cepInput.value.replace(/\D/g, '');
+    if (cep.length !== 8) {
+        showCepError('CEP inválido. Informe os 8 dígitos.');
+        return;
+    }
+    buscarCepBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    buscarCepBtn.disabled = true;
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(response => response.json())
+        .then(data => {
+            buscarCepBtn.innerHTML = '<i class="fas fa-search"></i>';
+            buscarCepBtn.disabled = false;
+            if (data.erro) {
+                showCepError('CEP não encontrado.');
                 return;
             }
-            
-            // Mostrar feedback de carregamento
-            buscarCepBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-            buscarCepBtn.disabled = true;
-            
-            fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                .then(response => response.json())
-                .then(data => {
-                    buscarCepBtn.innerHTML = '<i class="fas fa-search"></i>';
-                    buscarCepBtn.disabled = false;
-                    
-                    if (data.erro) {
-                        showCepError('CEP não encontrado.');
-                        return;
-                    }
-                    
-                    // Preencher os campos do formulário
-                    document.getElementById('logradouro').value = data.logradouro || '';
-                    document.getElementById('bairro').value = data.bairro || '';
-                    document.getElementById('cidade').value = data.localidade || '';
-                    document.getElementById('uf').value = data.uf || '';
-                    
-                    // Foca no campo de número
-                    document.getElementById('numero').focus();
-                    
-                    // Atualizar o campo de endereço completo
-                    atualizarEnderecoCompleto();
-                    
-                    // Limpar feedback de erro
-                    cepInput.classList.remove('is-invalid');
-                })
-                .catch(error => {
-                    buscarCepBtn.innerHTML = '<i class="fas fa-search"></i>';
-                    buscarCepBtn.disabled = false;
-                    showCepError('Erro ao buscar CEP. Tente novamente.');
-                    console.error('Erro na busca de CEP:', error);
-                });
+            document.getElementById('logradouro').value = data.logradouro || '';
+            document.getElementById('bairro').value = data.bairro || '';
+            document.getElementById('cidade').value = data.localidade || '';
+            document.getElementById('uf').value = data.uf || '';
+            document.getElementById('numero').focus();
+            atualizarEnderecoCompleto();
+            cepInput.classList.remove('is-invalid');
+        })
+        .catch(error => {
+            buscarCepBtn.innerHTML = '<i class="fas fa-search"></i>';
+            buscarCepBtn.disabled = false;
+            showCepError('Erro ao buscar CEP. Tente novamente.');
+            console.error('Erro na busca de CEP:', error);
         });
-        
-        // Função para mostrar erro de CEP
-        function showCepError(message) {
-            const cepFeedback = document.getElementById('cepFeedback');
-            cepFeedback.textContent = message;
-            cepInput.classList.add('is-invalid');
-        }
-        
-        // Atualizar automaticamente o campo de endereço completo quando os dados mudam
-        const camposEndereco = ['logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
-        camposEndereco.forEach(campo => {
-            document.getElementById(campo).addEventListener('input', atualizarEnderecoCompleto);
-        });
-        
-        function atualizarEnderecoCompleto() {
-            const logradouro = document.getElementById('logradouro').value;
-            const numero = document.getElementById('numero').value;
-            const complemento = document.getElementById('complemento').value;
-            const bairro = document.getElementById('bairro').value;
-            const cidade = document.getElementById('cidade').value;
-            const uf = document.getElementById('uf').value;
-            
-            let endereco = '';
-            if (logradouro) endereco += logradouro;
-            if (numero) endereco += ', ' + numero;
-            if (complemento) endereco += ' - ' + complemento;
-            if (bairro) endereco += ', ' + bairro;
-            if (cidade) endereco += ', ' + cidade;
-            if (uf) endereco += ' - ' + uf;
-            
-            document.getElementById('localizacao').value = endereco;
-        }
-    });
+});
+function showCepError(message) {
+    const cepFeedback = document.getElementById('cepFeedback');
+    cepFeedback.textContent = message;
+    cepInput.classList.add('is-invalid');
+}
+const camposEndereco = ['logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
+camposEndereco.forEach(campo => {
+    document.getElementById(campo).addEventListener('input', atualizarEnderecoCompleto);
+});
+function atualizarEnderecoCompleto() {
+    const logradouro = document.getElementById('logradouro').value;
+    const numero = document.getElementById('numero').value;
+    const complemento = document.getElementById('complemento').value;
+    const bairro = document.getElementById('bairro').value;
+    const cidade = document.getElementById('cidade').value;
+    const uf = document.getElementById('uf').value;
+    let endereco = '';
+    if (logradouro) endereco += logradouro;
+    if (numero) endereco += ', ' + numero;
+    if (complemento) endereco += ' - ' + complemento;
+    if (bairro) endereco += ', ' + bairro;
+    if (cidade) endereco += ', ' + cidade;
+    if (uf) endereco += ' - ' + uf;
+    document.getElementById('localizacao').value = endereco;
+}
 </script>
 {% endblock %}

@@ -2,32 +2,68 @@
 
 {% block title %}Monitoramento - {{ fonte.nome }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .monitor-btn-voltar {
+        margin-bottom: 1.5rem;
+    }
+    .monitor-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        padding: 2rem 2rem 1.5rem 2rem;
+        margin-bottom: 2rem;
+    }
+    .monitor-section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+    .monitor-alert {
+        background: #fff3f3;
+        border-left: 5px solid #dc3545;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .monitor-alert strong {
+        color: #dc3545;
+    }
+    .footer-custom {
+        margin-top: 3rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h1>Monitoramento - {{ fonte.nome }}</h1>
-    <hr>
-    <h3>Informações da Fonte</h3>
-    <ul>
-        <li><strong>Localização:</strong> {{ fonte.localizacao }}</li>
-        <li><strong>Capacidade:</strong> {{ fonte.capacidade }} kWp</li>
-        <li><strong>Marca/Modelo:</strong> {{ fonte.marca }} {{ fonte.modelo }}</li>
-        <li><strong>Data de Instalação:</strong> {{ fonte.data_instalacao }}</li>
-    </ul>
-    <h3 class="mt-4">Status de Performance</h3>
-    <p><strong>Status:</strong> <span class="performance-status {{ analise.performance_status }}">{{ analise.performance_status|title }}</span></p>
-    <p><strong>Última análise:</strong> {{ analise.ultima_atualizacao or 'N/A' }}</p>
-    <h3 class="mt-4">Alertas</h3>
-    {% if alertas %}
-        <ul>
-        {% for alerta in alertas %}
-            <li>
-                <strong>{{ alerta.tipo|title }}:</strong> {{ alerta.mensagem }}<br>
-                <small>Detectado em {{ alerta.data_criacao }}</small>
-            </li>
-        {% endfor %}
+<div class="container mt-4 mb-5">
+    <a href="{{ url_for('main.dashboard', fonte_id=fonte.id) }}" class="btn btn-success monitor-btn-voltar">
+        <i class="fas fa-arrow-left me-2"></i>Voltar para o Dashboard
+    </a>
+    <div class="monitor-card">
+        <h2 class="mb-3">Monitoramento - {{ fonte.nome }}</h2>
+        <div class="monitor-section-title">Informações da Fonte</div>
+        <ul class="mb-4">
+            <li><strong>Localização:</strong> {{ fonte.localizacao }}</li>
+            <li><strong>Capacidade:</strong> {{ fonte.capacidade }} kWp</li>
+            <li><strong>Marca/Modelo:</strong> {{ fonte.marca }} {{ fonte.modelo }}</li>
+            <li><strong>Data de Instalação:</strong> {{ fonte.data_instalacao }}</li>
         </ul>
-    {% else %}
-        <p>Nenhum alerta ativo.</p>
-    {% endif %}
+        <div class="monitor-section-title">Status de Performance</div>
+        <p><strong>Status:</strong> <span class="performance-status {{ analise.performance_status }}">{{ analise.performance_status|title }}</span></p>
+        <p><strong>Última análise:</strong> {{ analise.ultima_atualizacao or 'N/A' }}</p>
+        <div class="monitor-section-title">Alertas</div>
+        {% if alertas %}
+            {% for alerta in alertas %}
+                <div class="monitor-alert">
+                    <strong>{{ alerta.tipo|title }}:</strong> {{ alerta.mensagem }}<br>
+                    <small>Detectado em {{ alerta.data_criacao }}</small>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Nenhum alerta ativo.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %} 

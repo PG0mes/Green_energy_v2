@@ -167,101 +167,182 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-solar-panel me-2"></i>
-                GreenEnergy
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">
-                            <i class="fas fa-home me-1"></i> Início
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint == 'main.home' or request.endpoint == 'main.fontes_cadastradas' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-list me-1"></i> Fontes
-                            {% if request.fontes is defined %}
-                                <span class="badge rounded-pill fonte-badge">{{ request.fontes|length }}</span>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Acesso Rápido às Fontes</h6></li>
-                            <li><a class="dropdown-item {{ 'active' if request.endpoint == 'main.home' }}" href="{{ url_for('main.home') }}"><i class="fas fa-th-list me-2"></i>Todas as Fontes</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            
-                            {# Exibir fontes cadastradas no dropdown #}
-                            {% if request.fontes is defined and request.fontes|length > 0 %}
-                                {% for fonte in request.fontes[:5] %}
-                                    <li>
-                                        <a class="dropdown-item {{ 'active' if request.endpoint == 'main.dashboard' and request.view_args.fonte_id == fonte.id }}" href="{{ url_for('main.dashboard', fonte_id=fonte.id) }}">
-                                            <div class="fonte-icon"><i class="fas fa-solar-panel"></i></div>
-                                            <span>{{ fonte.nome }}</span>
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                                
-                                {% if request.fontes|length > 5 %}
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-primary" href="{{ url_for('main.home') }}">Ver todas ({{ request.fontes|length }} fontes)</a></li>
-                                {% endif %}
-                            {% else %}
-                                <li><a class="dropdown-item disabled">Nenhuma fonte cadastrada</a></li>
-                            {% endif %}
-                            
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-success {{ 'active' if request.endpoint == 'main.nova_fonte' }}" href="{{ url_for('main.nova_fonte') }}"><i class="fas fa-plus-circle me-2"></i>Adicionar Nova Fonte</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ 'active' if request.endpoint == 'main.nova_fonte' }}" href="{{ url_for('main.nova_fonte') }}">
-                            <i class="fas fa-plus-circle me-1"></i> Nova Fonte
-                        </a>
-                    </li>
-                </ul>
+    <!-- Sidebar -->
+    <div class="d-flex">
+        <nav id="sidebar" class="sidebar bg-dark text-light">
+            <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+                <span class="sidebar-logo d-flex align-items-center">
+                    <i class="fas fa-solar-panel me-2"></i>
+                    <span class="sidebar-title">GreenEnergy</span>
+                </span>
+                <button class="btn btn-link text-light p-0 sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-        </div>
-    </nav>
-
-    <!-- Flash Messages -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-light d-flex align-items-center {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
+                        <i class="fas fa-home me-2"></i>
+                        <span class="sidebar-text">Início</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-light d-flex align-items-center {% if request.endpoint == 'main.home' or request.endpoint == 'main.fontes_cadastradas' %}active{% endif %}" href="{{ url_for('main.home') }}">
+                        <i class="fas fa-list me-2"></i>
+                        <span class="sidebar-text">Fontes {% if request.fontes is defined %}({{ request.fontes|length }}){% endif %}</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-light d-flex align-items-center {% if request.endpoint == 'main.nova_fonte' %}active{% endif %}" href="{{ url_for('main.nova_fonte') }}">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        <span class="sidebar-text">Nova Fonte</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="main-content flex-grow-1">
+            <!-- Flash Messages -->
+            <div class="container mt-3">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <!-- Main Content -->
+            <div class="container mt-4">
+                {% block content %}{% endblock %}
+            </div>
+            <!-- Footer -->
+            <footer class="footer-custom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>GreenEnergy - Gerenciamento de Energia Limpa</h5>
+                            <p>TCC de Sistemas de Informação</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p>&copy; 2025 Pedro</p>
+                        </div>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
-
-    <!-- Main Content -->
-    <div class="container mt-4">
-        {% block content %}{% endblock %}
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer-custom">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>GreenEnergy - Gerenciamento de Energia Limpa</h5>
-                    <p>TCC de Sistemas de Informação</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p>&copy; 2025 Pedro</p>
-                </div>
-            </div>
+            </footer>
         </div>
-    </footer>
+    </div>
+
+    <!-- Sidebar CSS -->
+    <style>
+    .sidebar {
+        width: 250px;
+        min-height: 100vh;
+        background: var(--primary-color);
+        transition: width 0.3s;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 1030;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .sidebar-collapsed {
+        width: 70px !important;
+    }
+    .sidebar .sidebar-header {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        padding: 0 12px;
+    }
+    .sidebar .sidebar-logo {
+        font-weight: 600;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+    }
+    .sidebar .sidebar-title {
+        transition: opacity 0.3s;
+    }
+    .sidebar-collapsed .sidebar-title,
+    .sidebar-collapsed .sidebar-text {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+        display: inline-block;
+    }
+    .sidebar .sidebar-toggle {
+        background: none;
+        border: none;
+        font-size: 1.3rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        width: 40px;
+        margin-left: auto;
+        margin-right: 0;
+        transition: background 0.2s;
+    }
+    .sidebar .sidebar-toggle:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .sidebar .nav-link {
+        color: #fff;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0 30px 30px 0;
+        transition: background 0.2s, color 0.2s;
+        font-size: 1rem;
+    }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover {
+        background: var(--primary-dark);
+        color: #fff;
+    }
+    .sidebar .nav-link i {
+        font-size: 1.2rem;
+    }
+    .main-content {
+        margin-left: 250px;
+        transition: margin-left 0.3s;
+        width: 100%;
+    }
+    .sidebar-collapsed ~ .main-content {
+        margin-left: 70px;
+    }
+    @media (max-width: 991.98px) {
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            z-index: 1040;
+            transition: left 0.3s;
+        }
+        .sidebar.show {
+            left: 0;
+        }
+        .main-content {
+            margin-left: 0;
+        }
+    }
+    </style>
+    <!-- Sidebar JS -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainContent = document.querySelector('.main-content');
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+        });
+    </script>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

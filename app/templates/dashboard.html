@@ -81,6 +81,30 @@
     .performance-status.indisponível:before {
         background-color: #6c757d;
     }
+    /* Tabs customizadas */
+    .dashboard-tabs {
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 2rem;
+        margin-top: 1rem;
+    }
+    .dashboard-tab-btn {
+        background: none;
+        border: none;
+        outline: none;
+        color: #28a745;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 0.75rem 2rem;
+        border-radius: 10px 10px 0 0;
+        margin-right: 0.5rem;
+        transition: background 0.2s, color 0.2s;
+    }
+    .dashboard-tab-btn.active, .dashboard-tab-btn:hover {
+        background: #e9f7ef;
+        color: #218838;
+    }
+    .dashboard-tab-content { display: none; }
+    .dashboard-tab-content.active { display: block; }
 </style>
 {% endblock %}
 
@@ -100,20 +124,20 @@
     <div class="col-12 d-flex justify-content-between align-items-center">
         <h1>Dashboard - {{ fonte.nome }}</h1>
         <div>
-            <a href="{{ url_for('main.importar_dados', fonte_id=fonte.id) }}" class="btn btn-primary">
+            <a href="{{ url_for('main.importar_dados', fonte_id=fonte.id) }}" class="btn btn-success">
                 <i class="fas fa-file-import me-1"></i> Importar Dados
             </a>
             <form method="post" action="{{ url_for('main.importar_dados', fonte_id=fonte.id) }}" class="d-inline" id="simularForm">
                 <input type="hidden" name="gerar_simulados" value="on">
                 <input type="hidden" name="dias_simulados" value="30">
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn btn-outline-success">
                     <i class="fas fa-random me-1"></i> Gerar Dados Simulados
                 </button>
             </form>
             <a href="{{ url_for('main.editar_fonte', fonte_id=fonte.id) }}" class="btn btn-outline-secondary">
                 <i class="fas fa-edit me-1"></i> Editar Fonte
             </a>
-            <a href="{{ url_for('main.previsao_geracao', fonte_id=fonte.id) }}" class="btn btn-outline-info">
+            <a href="{{ url_for('main.previsao_geracao', fonte_id=fonte.id) }}" class="btn btn-outline-success">
                 <i class="fas fa-cloud-sun me-1"></i> Previsão de Geração
             </a>
         </div>
@@ -165,7 +189,7 @@
     </div>
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header bg-info text-white">
+            <div class="card-header bg-success text-white">
                 <h5 class="card-title mb-0">Status do Sistema</h5>
             </div>
             <div class="card-body">
@@ -182,7 +206,7 @@
                     <div class="col-md-6">
                         <p><strong>Última atualização:</strong> {{ metricas.ultima_atualizacao or 'N/A' }}</p>
                         <p>
-                            <a href="{{ url_for('main.monitoramento', fonte_id=fonte.id) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ url_for('main.monitoramento', fonte_id=fonte.id) }}" class="btn btn-sm btn-outline-success">
                                 <i class="fas fa-chart-line me-1"></i> Ver detalhes de performance
                                 {% if alertas_ativos %}
                                 <span class="badge bg-danger ms-1">{{ alertas_ativos|length }}</span>
@@ -196,109 +220,171 @@
     </div>
 </div>
 
-<!-- Métricas -->
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card card-dashboard h-100 bg-light">
-            <div class="card-body text-center">
-                <div class="metric-value text-success">{{ metricas.total_energia }} kWh</div>
-                <div class="metric-label">Total de Energia Gerada</div>
+<!-- Tabs -->
+<div class="dashboard-tabs d-flex">
+    <button class="dashboard-tab-btn active" data-tab="producao"><i class="fas fa-solar-panel me-1"></i>Produção</button>
+    <button class="dashboard-tab-btn" data-tab="consumo"><i class="fas fa-bolt me-1"></i>Consumo</button>
+    <button class="dashboard-tab-btn" data-tab="alertas"><i class="fas fa-exclamation-triangle me-1"></i>Alertas</button>
+</div>
+
+<!-- Conteúdo das Abas -->
+<div id="tab-producao" class="dashboard-tab-content active">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ metricas.total_energia }} kWh</div>
+                    <div class="metric-label">Total de Energia Gerada</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ metricas.media_diaria }} kWh</div>
+                    <div class="metric-label">Média Diária</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ metricas.potencia_maxima }} kW</div>
+                    <div class="metric-label">Pico de Potência</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card card-dashboard h-100 bg-light">
-            <div class="card-body text-center">
-                <div class="metric-value text-primary">{{ metricas.media_diaria }} kWh</div>
-                <div class="metric-label">Média Diária</div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Produção Diária (kWh)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoProducaoDiaria" height="300"></canvas>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card card-dashboard h-100 bg-light">
-            <div class="card-body text-center">
-                <div class="metric-value text-danger">{{ metricas.potencia_maxima }} kW</div>
-                <div class="metric-label">Pico de Potência</div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Produção por Hora (kW)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoProducaoHoraria" height="300"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Alertas -->
-{% if alertas_ativos %}
-<div class="row mb-4" id="alertasDetalhes">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-danger text-white">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <h5 class="card-title mb-0">Alertas Ativos ({{ alertas_ativos|length }})</h5>
+<div id="tab-consumo" class="dashboard-tab-content">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ metricas.consumo_total or '--' }} kWh</div>
+                    <div class="metric-label">Consumo Total da Instalação</div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    {% for alerta in alertas_ativos %}
-                    <div class="col-12 {% if alertas_ativos|length > 1 %}col-md-6{% endif %} mb-3">
-                        <div class="card border alert-card {{ alerta.tipo }}">
-                            <div class="card-body">
-                                <div class="d-flex">
-                                    <div class="alert-icon {{ alerta.tipo }}">
-                                        <i class="fas {% if alerta.tipo == 'crítico' %}fa-exclamation-circle fa-lg{% else %}fa-exclamation-triangle fa-lg{% endif %}"></i>
-                                    </div>
-                                    <div>
-                                        <div class="alert-header">{{ alerta.tipo|title }}</div>
-                                        <p class="mb-2">{{ alerta.mensagem }}</p>
-                                        <div class="alert-time">
-                                            <i class="far fa-clock me-1"></i>Detectado em {{ alerta.data_criacao }}
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ metricas.consumo_medio_diario or '--' }} kWh</div>
+                    <div class="metric-label">Consumo Médio Diário</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ metricas.consumo_por_tipo or '--' }}</div>
+                    <div class="metric-label">Consumo por Tipo de Equipamento</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Consumo Diário (kWh)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoConsumoDiario" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tab-alertas" class="dashboard-tab-content">
+    {% if alertas_ativos %}
+    <div class="row mb-4" id="alertasDetalhes">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <h5 class="card-title mb-0">Alertas Ativos ({{ alertas_ativos|length }})</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for alerta in alertas_ativos %}
+                        <div class="col-12 {% if alertas_ativos|length > 1 %}col-md-6{% endif %} mb-3">
+                            <div class="card border alert-card {{ alerta.tipo }}">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="alert-icon {{ alerta.tipo }}">
+                                            <i class="fas {% if alerta.tipo == 'crítico' %}fa-exclamation-circle fa-lg{% else %}fa-exclamation-triangle fa-lg{% endif %}"></i>
                                         </div>
-                                        <div class="mt-3">
-                                            <a href="{{ url_for('main.monitoramento', fonte_id=fonte.id) }}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
-                                            <form action="{{ url_for('main.resolver_alerta', fonte_id=fonte.id, alerta_id=alerta.id) }}" method="POST" class="d-inline">
-                                                <button type="submit" class="btn btn-sm btn-outline-success">
-                                                    <i class="fas fa-check me-1"></i>Marcar como resolvido
-                                                </button>
-                                            </form>
+                                        <div>
+                                            <div class="alert-header">{{ alerta.tipo|title }}</div>
+                                            <p class="mb-2">{{ alerta.mensagem }}</p>
+                                            <div class="alert-time">
+                                                <i class="far fa-clock me-1"></i>Detectado em {{ alerta.data_criacao }}
+                                            </div>
+                                            <div class="mt-3">
+                                                <a href="{{ url_for('main.monitoramento', fonte_id=fonte.id) }}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
+                                                <form action="{{ url_for('main.resolver_alerta', fonte_id=fonte.id, alerta_id=alerta.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-check me-1"></i>Marcar como resolvido
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endif %}
-
-<!-- Gráficos -->
-<div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0">Produção Diária (kWh)</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="graficoProducaoDiaria" height="300"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="card-title mb-0">Produção por Hora (kW)</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="graficoProducaoHoraria" height="300"></canvas>
-            </div>
-        </div>
-    </div>
+    {% else %}
+    <div class="alert alert-success">Nenhum alerta ativo no momento.</div>
+    {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    // Tabs dinâmicas
+    document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.dashboard-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.dashboard-tab-content').forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Gráficos de Produção (mantém igual)
     document.addEventListener('DOMContentLoaded', function() {
         // Função para mostrar mensagem de erro no gráfico
         function showChartError(elementId, message) {
@@ -311,8 +397,7 @@
                 element.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>${message}</div>`;
             }
         }
-
-        // Carregar dados de produção diária
+        // Produção Diária
         fetch('/api/fonte/{{ fonte.id }}/producao-diaria')
             .then(response => response.json())
             .then(data => {
@@ -320,7 +405,6 @@
                     showChartError('graficoProducaoDiaria', 'Sem dados disponíveis. Importe ou gere dados simulados.');
                     return;
                 }
-                
                 const ctx = document.getElementById('graficoProducaoDiaria').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -329,8 +413,8 @@
                         datasets: [{
                             label: 'Energia Gerada (kWh)',
                             data: data.map(item => item.energia),
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
                             borderWidth: 1
                         }]
                     },
@@ -357,8 +441,7 @@
                 console.error('Erro ao carregar dados diários:', error);
                 showChartError('graficoProducaoDiaria', 'Erro ao carregar dados. Tente novamente.');
             });
-        
-        // Carregar dados de produção horária
+        // Produção Horária
         fetch('/api/fonte/{{ fonte.id }}/producao-horaria')
             .then(response => response.json())
             .then(data => {
@@ -366,7 +449,6 @@
                     showChartError('graficoProducaoHoraria', 'Sem dados disponíveis. Importe ou gere dados simulados.');
                     return;
                 }
-                
                 const ctx = document.getElementById('graficoProducaoHoraria').getContext('2d');
                 new Chart(ctx, {
                     type: 'line',
@@ -375,8 +457,8 @@
                         datasets: [{
                             label: 'Potência (kW)',
                             data: data.map(item => item.potencia),
-                            backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
                             borderWidth: 2,
                             tension: 0.4,
                             fill: 'origin'
@@ -405,6 +487,38 @@
                 console.error('Erro ao carregar dados horários:', error);
                 showChartError('graficoProducaoHoraria', 'Erro ao carregar dados. Tente novamente.');
             });
+        // Consumo Diário (placeholder)
+        const ctxConsumo = document.getElementById('graficoConsumoDiario').getContext('2d');
+        new Chart(ctxConsumo, {
+            type: 'bar',
+            data: {
+                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                datasets: [{
+                    label: 'Consumo (kWh)',
+                    data: [12, 15, 10, 14, 13, 16, 11],
+                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'kWh'
+                        }
+                    }
+                },
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
     });
 </script>
 {% endblock %}

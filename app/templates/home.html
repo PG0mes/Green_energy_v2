@@ -5,7 +5,7 @@
 {% block extra_css %}
 <style>
     .hero-section {
-        background: linear-gradient(135deg, #1e7e34 0%, #28a745 100%);
+        background: linear-gradient(135deg, #218838 0%, #28a745 100%);
         padding: 100px 0;
         margin-bottom: 30px;
     }
@@ -35,23 +35,9 @@
         scroll-margin-top: 80px;
     }
 
-    .navbar-nav .nav-link {
-        position: relative;
-    }
-
-    .navbar-nav .nav-link::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: 0;
-        left: 0;
-        background-color: #fff;
-        transition: width 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover::after {
-        width: 100%;
+    /* Centralizar conteúdo considerando sidebar */
+    .container {
+        max-width: 1100px;
     }
 </style>
 {% endblock %}
@@ -95,10 +81,10 @@
             <div class="col-md-4">
                 <div class="card feature-card">
                     <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
                         <h5 class="card-title">Dashboard</h5>
                         <p class="card-text">Visualize métricas e análises em tempo real.</p>
-                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-success">
                             <i class="fas fa-chart-bar me-2"></i>Visualizar
                         </a>
                     </div>
@@ -107,10 +93,10 @@
             <div class="col-md-4">
                 <div class="card feature-card">
                     <div class="card-body text-center">
-                        <i class="fas fa-file-import fa-3x text-info mb-3"></i>
+                        <i class="fas fa-file-import fa-3x text-success mb-3"></i>
                         <h5 class="card-title">Importação de Dados</h5>
                         <p class="card-text">Importe dados dos seus inversores Growatt.</p>
-                        <a href="#" class="btn btn-outline-info">
+                        <a href="#" class="btn btn-outline-success">
                             <i class="fas fa-upload me-2"></i>Importar
                         </a>
                     </div>
@@ -132,18 +118,18 @@
                 <p class="h2 text-success">123.45 kWh</p>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="display-4 text-primary">
+                <div class="display-4 text-success">
                     <i class="fas fa-solar-panel"></i>
                 </div>
                 <h3 class="h5 mt-3">Fontes Ativas</h3>
-                <p class="h2 text-primary">{{ fontes|length if fontes else 0 }}</p>
+                <p class="h2 text-success">{{ fontes|length if fontes else 0 }}</p>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="display-4 text-info">
+                <div class="display-4 text-success">
                     <i class="fas fa-leaf"></i>
                 </div>
                 <h3 class="h5 mt-3">Impacto Ambiental</h3>
-                <p class="h2 text-info">-45.6 CO₂</p>
+                <p class="h2 text-success">-45.6 CO₂</p>
             </div>
         </div>
     </div>

@@ -7,6 +7,7 @@ from app.controllers.generation_forecaster import GenerationForecaster
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from app.services.supabase_client import supabase
 
 main = Blueprint('main', __name__)
 
@@ -32,27 +33,28 @@ def nova_fonte():
     """Cadastro de uma nova fonte de energia"""
     if request.method == 'POST':
         try:
-            fonte = FonteEnergia(
-                nome=request.form['nome'],
-                localizacao=request.form['localizacao'],
-                capacidade=request.form['capacidade'],
-                marca=request.form['marca'],
-                modelo=request.form['modelo'],
-                data_instalacao=request.form['data_instalacao']
-            )
-            
-            FonteEnergiaRepository.salvar(fonte)
+            data = {
+                'nome': request.form['nome'],
+                'localizacao': request.form['localizacao'],
+                'capacidade': float(request.form['capacidade']),
+                'marca': request.form['marca'],
+                'modelo': request.form['modelo'],
+                'data_instalacao': request.form['data_instalacao']
+            }
+            # Inserir no Supabase
+            result = supabase.table('fontes_energia').insert(data).execute()
+            if result.data and len(result.data) > 0:
+                fonte_id = result.data[0]['id']
+            else:
+                raise Exception('Erro ao cadastrar fonte no Supabase.')
             flash('Fonte de energia cadastrada com sucesso!', 'success')
-            
             # Gerar dados simulados para desenvolvimento
             if request.form.get('gerar_dados_simulados') == 'on':
-                GrowattDataImporter.gerar_dados_simulados(fonte.id)
+                GrowattDataImporter.gerar_dados_simulados(fonte_id)
                 flash('Dados simulados gerados com sucesso!', 'success')
-                
-            return redirect(url_for('main.dashboard', fonte_id=fonte.id))
+            return redirect(url_for('main.dashboard', fonte_id=fonte_id))
         except Exception as e:
             flash(f'Erro ao cadastrar fonte: {str(e)}', 'danger')
-    
     return render_template('cadastro_fonte.html')
 
 @main.route('/fonte/<int:fonte_id>')
