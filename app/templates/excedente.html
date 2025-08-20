@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-panel">
+    <h1 class="panel-title">{{ titulo }}</h1>
+    
+    <div class="excedente-box">
+        <h2>Excedente Gerado</h2>
+        <div class="excedente-value">{{ "%.1f"|format(excedente_gerado) }} kWh</div>
+        <p class="excedente-subtitle">Total de Créditos Gerados</p>
+    </div>
+    
+    <div class="detalhes-section">
+        <h3>Detalhes do Cálculo</h3>
+        <ul class="detalhes-list">
+            {% for detalhe in detalhes_calculo %}
+                <li>{{ detalhe }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <a href="{{ url_for('dashboard', fonte_id=fonte.id) }}" class="back-button">Voltar ao Dashboard</a>
+</div>
+{% endblock %}

@@ -4,6 +4,7 @@ from app.data_processors.data_importer import GrowattDataImporter
 from app.controllers.dashboard_controller import DashboardController
 from app.controllers.performance_monitor import PerformanceMonitor
 from app.controllers.generation_forecaster import GenerationForecaster
+from app.services.calculos import calcular_excedente  # Corrigir importação
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -138,6 +139,26 @@ def importar_dados(fonte_id):
     
     return render_template('importar_dados.html', fonte=fonte)
 
+@main.route('/dashboard/<int:fonte_id>/excedente')
+def excedente(fonte_id):
+    """Subseção de Excedente - Exibe o cálculo do excedente gerado"""
+    fonte = FonteEnergiaRepository.buscar_por_id(fonte_id)
+    if not fonte:
+        flash('Fonte não encontrada!', 'danger')
+        return redirect(url_for('main.index'))
+    
+    # Calcular o excedente gerado
+    excedente_gerado = calcular_excedente(fonte_id)
+    
+    # Obter detalhes do cálculo (exemplo: geração total - consumo total)
+    detalhes_calculo = DashboardController.obter_detalhes_calculo_excedente(fonte_id)
+    
+    return render_template('excedente.html', 
+                           fonte=fonte, 
+                           titulo=f"Excedente - {fonte.nome}",
+                           excedente_gerado=excedente_gerado,
+                           detalhes_calculo=detalhes_calculo)
+
 @main.route('/dashboard/<int:fonte_id>')
 def dashboard(fonte_id):
     """Dashboard para visualização dos dados de geração"""
@@ -172,12 +193,16 @@ def dashboard(fonte_id):
     if not dados_reais:
         flash('Exibindo dados simulados para demonstração. Para visualizar dados reais, importe ou gere dados simulados.', 'info')
     
+    excedente_gerado = calcular_excedente(fonte_id)
+    detalhes_calculo = DashboardController.obter_detalhes_calculo_excedente(fonte_id)
     return render_template('dashboard.html', 
                           fonte=fonte, 
                           titulo=f"Dashboard - {fonte.nome}",
                           alertas_ativos=alertas_ativos,
                           analise_performance=analise_performance,
-                          metricas=metricas)
+                          metricas=metricas,
+                          excedente_gerado=excedente_gerado,
+                          detalhes_calculo=detalhes_calculo)
 
 @main.route('/api/fonte/<int:fonte_id>/producao-diaria')
 def api_producao_diaria(fonte_id):

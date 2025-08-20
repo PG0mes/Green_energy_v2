@@ -105,6 +105,17 @@
     }
     .dashboard-tab-content { display: none; }
     .dashboard-tab-content.active { display: block; }
+
+    /* Excedente box */
+    .excedente-detalhes {
+        background: #e9f7ef;
+        border: 1px solid #b7e4c7;
+        border-radius: 8px;
+        padding: 16px;
+    }
+    .excedente-detalhes h6 {
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -119,6 +130,9 @@
         </nav>
     </div>
 </div>
+
+<!-- Excedente Gerado - destacado no topo -->
+<!-- Bloco removido conforme solicitação do usuário -->
 
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
@@ -225,6 +239,7 @@
     <button class="dashboard-tab-btn active" data-tab="producao"><i class="fas fa-solar-panel me-1"></i>Produção</button>
     <button class="dashboard-tab-btn" data-tab="consumo"><i class="fas fa-bolt me-1"></i>Consumo</button>
     <button class="dashboard-tab-btn" data-tab="alertas"><i class="fas fa-exclamation-triangle me-1"></i>Alertas</button>
+    <button class="dashboard-tab-btn" data-tab="excedente"><i class="fas fa-coins me-1"></i>Excedente</button>
 </div>
 
 <!-- Conteúdo das Abas -->
@@ -370,6 +385,63 @@
     <div class="alert alert-success">Nenhum alerta ativo no momento.</div>
     {% endif %}
 </div>
+
+<div id="tab-excedente" class="dashboard-tab-content">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ detalhes_calculo.producao }} kWh</div>
+                    <div class="metric-label">Energia Gerada</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ detalhes_calculo.consumo }} kWh</div>
+                    <div class="metric-label">Energia Consumida</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 bg-light">
+                <div class="card-body text-center">
+                    <div class="metric-value text-success">{{ detalhes_calculo.excedente }} kWh</div>
+                    <div class="metric-label">Excedente Gerado</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Detalhes do Cálculo</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Funções utilizadas</strong>:</p>
+                    <ul class="mb-3">
+                        <li><code>obter_producao(fonte_id)</code></li>
+                        <li><code>obter_consumo(fonte_id)</code></li>
+                        <li><code>calcular_excedente(fonte_id)</code></li>
+                    </ul>
+                    <p class="mb-2"><strong>Fórmula</strong>: <code>excedente = max(0, produção - consumo)</code></p>
+                    {% if detalhes_calculo and detalhes_calculo.passos %}
+                    <p class="mb-2"><strong>Passo a passo</strong>:</p>
+                    <ul class="mb-0">
+                        {% for passo in detalhes_calculo.passos %}
+                        <li>{{ passo }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}

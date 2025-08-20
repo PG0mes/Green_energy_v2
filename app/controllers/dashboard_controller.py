@@ -251,3 +251,50 @@ class DashboardController:
             })
             
         return resultado
+
+    @staticmethod
+    def obter_detalhes_calculo_excedente(fonte_id):
+        """Retorna detalhes do cálculo do excedente.
+        Estrutura:
+        {
+            'producao': float,
+            'consumo': float,
+            'excedente': float,
+            'passos': [str, ...]
+        }
+        """
+        try:
+            from app.services.calculos import (
+                obter_producao,
+                obter_consumo,
+                calcular_excedente,
+            )
+        except Exception:
+            # Em caso de erro de importação, retorna estrutura mínima
+            return {
+                'producao': 0.0,
+                'consumo': 0.0,
+                'excedente': 0.0,
+                'passos': [
+                    'Não foi possível carregar as funções de cálculo.',
+                ],
+            }
+
+        producao = float(obter_producao(fonte_id))
+        consumo = float(obter_consumo(fonte_id))
+        excedente = float(calcular_excedente(fonte_id))
+
+        passos = [
+            'Funções utilizadas: obter_producao(fonte_id), obter_consumo(fonte_id), calcular_excedente(fonte_id)',
+            f'Produção total (kWh): {producao}',
+            f'Consumo total (kWh): {consumo}',
+            'Fórmula: excedente = max(0, produção - consumo)',
+            f'Cálculo: excedente = max(0, {producao} - {consumo}) = {excedente} kWh',
+        ]
+
+        return {
+            'producao': producao,
+            'consumo': consumo,
+            'excedente': excedente,
+            'passos': passos,
+        }
