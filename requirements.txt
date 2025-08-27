@@ -8,3 +8,4 @@ Flask-WTF==1.0.0
 WTForms==3.0.0
 python-dotenv==0.19.1
 requests==2.31.0
+Flask-Login==0.6.3

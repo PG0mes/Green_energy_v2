@@ -164,6 +164,56 @@
                 transform: none;
             }
         }
+        
+        /* Estilos para a navbar superior */
+        .navbar-dark {
+            background-color: #212529 !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+        
+        .user-avatar i {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        
+        .dropdown-menu {
+            margin-top: 0.5rem;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border-radius: 10px;
+        }
+        
+        .dropdown-header {
+            padding: 0.5rem 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .dropdown-item.text-danger:hover {
+            background-color: #f8d7da;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -202,6 +252,76 @@
             </ul>
         </nav>
         <div class="main-content flex-grow-1">
+            <!-- Navbar superior -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <span class="navbar-brand d-lg-none">
+                        <i class="fas fa-solar-panel me-2"></i>
+                        GreenEnergy
+                    </span>
+                    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            {% if current_user.is_authenticated %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                        <div class="user-avatar me-2">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                        <span>{{ current_user.name }}</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <div class="dropdown-header">
+                                                <strong>{{ current_user.name }}</strong><br>
+                                                <small class="text-muted">{{ current_user.email }}</small>
+                                            </div>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-user-cog me-2"></i>
+                                                Perfil
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-cog me-2"></i>
+                                                Configurações
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{{ url_for('main.logout') }}">
+                                                <i class="fas fa-sign-out-alt me-2"></i>
+                                                Sair
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('main.login') }}">
+                                        <i class="fas fa-sign-in-alt me-2"></i>
+                                        Entrar
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('main.register') }}">
+                                        <i class="fas fa-user-plus me-2"></i>
+                                        Cadastrar
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            
             <!-- Flash Messages -->
             <div class="container mt-3">
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -214,6 +334,18 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
+                
+                <!-- Mensagem de login obrigatório -->
+                {% if not current_user.is_authenticated and request.endpoint and not request.endpoint.startswith('main.login') and not request.endpoint.startswith('main.register') %}
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Atenção:</strong> Você precisa fazer login para acessar o sistema.
+                        <a href="{{ url_for('main.login') }}" class="btn btn-warning btn-sm ms-3">
+                            <i class="fas fa-sign-in-alt me-1"></i>Fazer Login
+                        </a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
             </div>
             <!-- Main Content -->
             <div class="container mt-4">
