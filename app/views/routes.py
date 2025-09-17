@@ -441,3 +441,17 @@ def previsao_geracao(fonte_id):
     return render_template('previsao.html', 
                            fonte=fonte, 
                            titulo=f"Previsão de Geração - {fonte.nome}")
+
+@main.route('/solar-credits')
+@login_required
+def solar_credits():
+    """Página de Créditos Solares"""
+    # Simula detalhes do cálculo de excedente (pode ser o mesmo do dashboard)
+    detalhes_calculo_excedente = DashboardController.obter_detalhes_calculo_excedente(None)  # None ou fonte_id se desejar
+    # Simula histórico de transações
+    transacoes_simuladas = [
+        {'data': '01/01/2025', 'kwh_excedente': 15.2, 'greencoin_recebido': 15.2, 'status': 'Processado'},
+        {'data': '02/01/2025', 'kwh_excedente': 18.5, 'greencoin_recebido': 18.5, 'status': 'Processado'},
+        {'data': '03/01/2025', 'kwh_excedente': 9.1, 'greencoin_recebido': 9.1, 'status': 'Processado'}
+    ]
+    return render_template('solar_credits.html', detalhes_calculo_excedente=detalhes_calculo_excedente, transacoes_simuladas=transacoes_simuladas)

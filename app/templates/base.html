@@ -249,6 +249,12 @@
                         <span class="sidebar-text">Nova Fonte</span>
                     </a>
                 </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-light d-flex align-items-center {% if request.endpoint == 'main.solar_credits' %}active{% endif %}" href="{{ url_for('main.solar_credits') }}">
+                        <i class="fas fa-coins me-2"></i>
+                        <span class="sidebar-text">Créditos Solares</span>
+                    </a>
+                </li>
             </ul>
         </nav>
         <div class="main-content flex-grow-1">
@@ -489,3 +495,4 @@
     {% block scripts %}{% endblock %}
 </body>
 </html>
+``` 
