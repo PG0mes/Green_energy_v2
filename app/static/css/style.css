@@ -16,6 +16,11 @@ body {
     font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: var(--text-dark);
     line-height: 1.6;
+    min-height: 100vh;
+}
+
+html, body {
+    height: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -119,6 +124,7 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-light);
     padding: 2rem 0;
     margin-top: 4rem;
+    width: 100%;
 }
 
 .footer-custom h5 {
