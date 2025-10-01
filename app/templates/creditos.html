@@ -19,33 +19,44 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <h4 class="card-title mb-3"><i class="fas fa-coins me-2 text-success"></i>Saldo Atual</h4>
+                
                 <div class="d-flex align-items-center mb-2">
                     <div class="me-3">
-                        <span class="h2 text-success">42.8</span>
+                        <span class="h2 text-success">{{ "%.4f"|format(gec_balance) }}</span>
                         <span class="ms-1">GreenCoin</span>
                     </div>
                 </div>
+                
                 <div>
                     <span class="h5">42.8</span>
-                    <span class="ms-1">kWh Excedente</span>
+                    <span class="ms-1">kWh Excedente (a reivindicar)</span>
                 </div>
+
+                {% if wallet_address %}
+                    <button class="btn btn-success mt-3" id="btnReivindicar">
+                        <i class="fas fa-gift me-2"></i>Reivindicar 42.8 GEC
+                    </button>
+                {% else %}
+                    <p class="text-muted mt-3"><small>Conecte sua carteira para poder reivindicar.</small></p>
+                {% endif %}
             </div>
         </div>
     </div>
     <div class="col-md-6 mb-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex flex-column justify-content-between">
-                <h4 class="card-title mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Taxa de Conversão</h4>
-                <p>1 kWh de Excedente = 1 GreenCoin</p>
-                
-                <div id="metamask-section">
+                <div>
+                    <h4 class="card-title mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Taxa de Conversão</h4>
+                    <p>1 kWh de Excedente = 1 GreenCoin</p>
+                </div>
+                <div>
                     {% if wallet_address %}
-                        <div class="alert alert-success">
+                        <div class="alert alert-success mt-3">
                             <i class="fas fa-check-circle me-1"></i>
                             Conectado com: <strong class="font-monospace">{{ wallet_address[:6] }}...{{ wallet_address[-4:] }}</strong>
                         </div>
                     {% else %}
-                        <button class="btn btn-primary" id="btnConnectMetamask">
+                        <button class="btn btn-primary mt-3" id="btnConnectMetamask">
                             <i class="fas fa-wallet me-2"></i>Conectar com a Metamask
                         </button>
                     {% endif %}
@@ -73,11 +84,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for t in transacoes %} {# Ajustado para usar a variável correta #}
+                            {% for t in transacoes %}
                             <tr>
                                 <td>{{ t.data }}</td>
-                                <td>{{ t.kwh }}</td> {# Ajustado para usar a variável correta #}
-                                <td>{{ t.gec }}</td> {# Ajustado para usar a variável correta #}
+                                <td>{{ t.kwh }}</td>
+                                <td>{{ t.gec }}</td>
                                 <td><span class="badge bg-success">{{ t.status }}</span></td>
                             </tr>
                             {% endfor %}
@@ -93,47 +104,46 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Script da página de créditos iniciado!"); 
     const btnConnect = document.getElementById('btnConnectMetamask');
-    console.log("Botão encontrado:", btnConnect); 
-
     if (btnConnect) {
         btnConnect.addEventListener('click', async () => {
-            // Verifica se o MetaMask está instalado
-            if (typeof window.ethereum === 'undefined') {
-                alert('MetaMask não está instalado! Por favor, instale a extensão para continuar.');
-                return;
-            }
-
+            if (typeof window.ethereum === 'undefined') return alert('MetaMask não instalado!');
             try {
-                // Solicita ao usuário para conectar sua carteira
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const userAddress = accounts[0];
-
-                if (userAddress) {
-                    console.log('Carteira conectada:', userAddress);
-                    
-                    // Envia o endereço para o backend para ser salvo na sessão
+                if (accounts[0]) {
                     const response = await fetch('/api/connect-wallet', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ address: userAddress }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ address: accounts[0] }),
                     });
-
                     const result = await response.json();
+                    if (result.success) window.location.reload();
+                    else alert('Falha ao conectar: ' + result.message);
+                }
+            } catch (error) { console.error(error); alert('Erro ao conectar.'); }
+        });
+    }
 
-                    if (result.success) {
-                        // Recarrega a página para mostrar o status "Conectado"
-                        window.location.reload();
-                    } else {
-                        alert('Falha ao conectar a carteira no servidor: ' + result.message);
-                    }
+    const btnReivindicar = document.getElementById('btnReivindicar');
+    if (btnReivindicar) {
+        btnReivindicar.addEventListener('click', async () => {
+            btnReivindicar.disabled = true;
+            btnReivindicar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processando...';
+            try {
+                const response = await fetch('/api/reivindicar-creditos', { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    alert(`Sucesso! ${result.message}\nConsulte a transação: https://sepolia.etherscan.io/tx/${result.tx_hash}`);
+                    window.location.reload(); 
+                } else {
+                    alert(`Erro: ${result.message}`);
                 }
             } catch (error) {
-                console.error('Erro ao conectar com a MetaMask:', error);
-                alert('Ocorreu um erro ao tentar conectar com a MetaMask. Verifique o console para mais detalhes.');
+                console.error(error);
+                alert('Erro de comunicação.');
+            } finally {
+                btnReivindicar.disabled = false;
+                btnReivindicar.innerHTML = '<i class="fas fa-gift me-2"></i>Reivindicar GreenCoins';
             }
         });
     }

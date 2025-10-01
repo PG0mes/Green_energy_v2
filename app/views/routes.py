@@ -11,6 +11,9 @@ import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from app.services.supabase_client import supabase
+from app.services.blockchain_service import mint_gec_tokens
+from flask import session # Adicione a importação de 'session'
+from app.services.blockchain_service import mint_gec_tokens, get_gec_balance
 
 main = Blueprint('main', __name__)
 
@@ -442,16 +445,89 @@ def previsao_geracao(fonte_id):
                            fonte=fonte, 
                            titulo=f"Previsão de Geração - {fonte.nome}")
 
-@main.route('/solar-credits')
-@login_required
-def solar_credits():
-    """Página de Créditos Solares"""
-    # Simula detalhes do cálculo de excedente (pode ser o mesmo do dashboard)
-    detalhes_calculo_excedente = DashboardController.obter_detalhes_calculo_excedente(None)  # None ou fonte_id se desejar
-    # Simula histórico de transações
+@main.route('/creditos-solares')
+def creditos_solares():
+    """Renderiza a página de Créditos Solares."""
+    wallet_address = session.get('wallet_address')
+    gec_balance = 0.0
+
+    if wallet_address:
+        # Se a carteira estiver conectada, busca o saldo real na blockchain
+        gec_balance = get_gec_balance(wallet_address)
+
+    # Simulação de dados para o histórico (vamos manter por enquanto)
     transacoes_simuladas = [
-        {'data': '01/01/2025', 'kwh_excedente': 15.2, 'greencoin_recebido': 15.2, 'status': 'Processado'},
-        {'data': '02/01/2025', 'kwh_excedente': 18.5, 'greencoin_recebido': 18.5, 'status': 'Processado'},
-        {'data': '03/01/2025', 'kwh_excedente': 9.1, 'greencoin_recebido': 9.1, 'status': 'Processado'}
+        {"data": "01/01/2025", "kwh": "15.2", "gec": "15.2", "status": "Processado"},
+        {"data": "02/01/2025", "kwh": "18.5", "gec": "18.5", "status": "Processado"},
+        {"data": "03/01/2025", "kwh": "9.1", "gec": "9.1", "status": "Processado"},
     ]
-    return render_template('solar_credits.html', detalhes_calculo_excedente=detalhes_calculo_excedente, transacoes_simuladas=transacoes_simuladas)
+    
+    return render_template('creditos.html', # Verifique se o nome do seu arquivo é este
+                           titulo="Créditos Solares", 
+                           transacoes=transacoes_simuladas,
+                           wallet_address=wallet_address,
+                           gec_balance=gec_balance) # Passando o saldo real para o template
+
+@main.route('/teste/mint/<string:wallet_address>/<float:amount>')
+def teste_mint(wallet_address, amount):
+    """
+    ROTA DE TESTE: Executa a função de mint para um endereço de carteira.
+    Exemplo de uso: http://127.0.0.1:5000/teste/mint/SEU_ENDERECO_METAMASK/10.5
+    """
+    print(f"Recebida requisição de mint para {wallet_address} com a quantidade {amount}")
+    
+    # Chama a função do nosso serviço de blockchain
+    resultado = mint_gec_tokens(wallet_address, amount)
+    
+    if resultado and resultado.get("success"):
+        flash(f'Sucesso! {resultado.get("message")}. Hash da transação: {resultado.get("tx_hash")}', 'success')
+    else:
+        flash(f'Erro no mint. {resultado.get("message", "Erro desconhecido.")}', 'danger')
+        
+    # Retorna uma resposta JSON e também redireciona para a home com flash message
+    return jsonify(resultado)
+
+@main.route('/api/connect-wallet', methods=['POST'])
+def connect_wallet():
+    """
+    Recebe o endereço da carteira do frontend e o armazena na sessão.
+    Em um aplicativo real, você faria uma verificação de assinatura aqui.
+    """
+    data = request.json
+    wallet_address = data.get('address')
+
+    if not wallet_address:
+        return jsonify({"success": False, "message": "Endereço da carteira não fornecido."}), 400
+
+    # Armazena o endereço da carteira na sessão do usuário
+    session['wallet_address'] = wallet_address
+    print(f"Carteira {wallet_address} conectada e armazenada na sessão.")
+    
+    return jsonify({"success": True, "message": "Carteira conectada com sucesso!"})
+
+@main.route('/api/reivindicar-creditos', methods=['POST'])
+def reivindicar_creditos():
+    """
+    Endpoint para o usuário reivindicar (mintar) seus tokens GEC.
+    """
+    wallet_address = session.get('wallet_address')
+    if not wallet_address:
+        return jsonify({"success": False, "message": "Nenhuma carteira conectada."}), 403
+
+    # --- Lógica de Negócio (Simplificada para o teste) ---
+    # No futuro, essa lógica será mais complexa:
+    # 1. Calcular o excedente real do usuário.
+    # 2. Verificar se ele já não reivindicou esses créditos.
+    # 3. Chamar o mint com o valor real.
+    # Por agora, vamos usar um valor fixo de 15.5 para o teste.
+    quantidade_a_mintar = 15.5 
+
+    print(f"Iniciando processo de mint de {quantidade_a_mintar} GEC para {wallet_address}")
+    
+    # Chama nosso serviço de blockchain que já está pronto
+    resultado = mint_gec_tokens(wallet_address, quantidade_a_mintar)
+    
+    # No futuro, aqui também teríamos a lógica para atualizar o banco de dados,
+    # marcando que esses créditos já foram pagos.
+
+    return jsonify(resultado)
