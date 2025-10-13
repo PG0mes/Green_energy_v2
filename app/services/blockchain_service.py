@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- CONFIGURAÇÃO DO CONTRATO ---
-CONTRACT_ADDRESS = "0xF4986525C69B335d504437Df5c0715831ed02ff9"
+CONTRACT_ADDRESS = "0xAaf76E5a2e26Df7223670e12bad7A1631fb14c5f"
 CONTRACT_ABI = """
 [
     { "inputs": [ { "internalType": "address", "name": "initialOwner", "type": "address" } ], "stateMutability": "nonpayable", "type": "constructor" },

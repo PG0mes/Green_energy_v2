@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "fonte_id": 1,
+        "data": "2025-10-10 14:54:12",
+        "kwh_excedente": 25.8,
+        "gec_recebido": 25.8,
+        "status": "Processado",
+        "tx_hash": "1c0f33b3f2c554bd1e6ad17558365175dfc7c6c0140b85473fb8bc617c6cbdcd"
+    }
+]

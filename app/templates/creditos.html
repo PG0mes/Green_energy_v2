@@ -2,6 +2,24 @@
 
 {% block title %}Créditos Solares{% endblock %}
 
+{% block extra_css %}
+<style>
+    .card-metric { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .status-processed a {
+        background-color: #e9f7ef;
+        color: #28a745;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+    .status-processed a:hover {
+        background-color: #d1fae5;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row mb-3">
     <div class="col-12">
@@ -18,35 +36,38 @@
     <div class="col-md-6 mb-3">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h4 class="card-title mb-3"><i class="fas fa-coins me-2 text-success"></i>Saldo Atual</h4>
+                <h4 class="card-title mb-3"><i class="fas fa-coins me-2 text-success"></i>Saldo</h4>
                 
-                <div class="d-flex align-items-center mb-2">
-                    <div class="me-3">
-                        <span class="h2 text-success">{{ "%.4f"|format(gec_balance) }}</span>
-                        <span class="ms-1">GreenCoin</span>
-                    </div>
+                <div class="mb-2">
+                    <span class="h2 text-success">{{ "%.4f"|format(gec_balance) }}</span>
+                    <span class="ms-1">GreenCoin (na carteira)</span>
                 </div>
                 
                 <div>
-                    <span class="h5">42.8</span>
+                    <span class="h5">{{ "%.2f"|format(excedente_a_reivindicar) }}</span>
                     <span class="ms-1">kWh Excedente (a reivindicar)</span>
                 </div>
 
                 {% if wallet_address %}
-                    <button class="btn btn-success mt-3" id="btnReivindicar">
-                        <i class="fas fa-gift me-2"></i>Reivindicar 42.8 GEC
-                    </button>
+                    {% if excedente_a_reivindicar > 0 %}
+                        <button class="btn btn-success mt-3" id="btnReivindicar">
+                            <i class="fas fa-gift me-2"></i>Reivindicar {{ "%.2f"|format(excedente_a_reivindicar) }} GEC
+                        </button>
+                    {% else %}
+                        <p class="text-success mt-3"><i class="fas fa-check-circle me-2"></i>Você está em dia! Nenhum crédito pendente.</p>
+                    {% endif %}
                 {% else %}
                     <p class="text-muted mt-3"><small>Conecte sua carteira para poder reivindicar.</small></p>
                 {% endif %}
             </div>
         </div>
     </div>
+
     <div class="col-md-6 mb-3">
         <div class="card shadow-sm h-100">
             <div class="card-body d-flex flex-column justify-content-between">
                 <div>
-                    <h4 class="card-title mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Taxa de Conversão</h4>
+                    <h4 class="card-title mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Conexão</h4>
                     <p>1 kWh de Excedente = 1 GreenCoin</p>
                 </div>
                 <div>
@@ -78,18 +99,28 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Data</th>
-                                <th>kWh Excedente</th>
-                                <th>GreenCoin Recebido</th>
-                                <th>Status</th>
+                                <th>kWh Reivindicado</th>
+                                <th>GEC Recebido</th>
+                                <th>Status / Transação</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for t in transacoes %}
+                            {% for t in transacoes | reverse %}
                             <tr>
                                 <td>{{ t.data }}</td>
-                                <td>{{ t.kwh }}</td>
-                                <td>{{ t.gec }}</td>
-                                <td><span class="badge bg-success">{{ t.status }}</span></td>
+                                <td>{{ t.kwh_excedente }}</td>
+                                <td>{{ t.gec_recebido }}</td>
+                                <td>
+                                    <span class="status-processed">
+                                        <a href="https://sepolia.etherscan.io/tx/{{ t.tx_hash }}" target="_blank" title="Ver no Etherscan">
+                                            {{ t.status }} <i class="fas fa-external-link-alt ms-1"></i>
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted p-4">Nenhuma transação de reivindicação encontrada.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -104,10 +135,14 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- LÓGICA DO BOTÃO DE CONEXÃO ---
     const btnConnect = document.getElementById('btnConnectMetamask');
     if (btnConnect) {
         btnConnect.addEventListener('click', async () => {
-            if (typeof window.ethereum === 'undefined') return alert('MetaMask não instalado!');
+            if (typeof window.ethereum === 'undefined') {
+                return alert('MetaMask não está instalado! Por favor, instale a extensão para continuar.');
+            }
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 if (accounts[0]) {
@@ -117,13 +152,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         body: JSON.stringify({ address: accounts[0] }),
                     });
                     const result = await response.json();
-                    if (result.success) window.location.reload();
-                    else alert('Falha ao conectar: ' + result.message);
+                    if (result.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Falha ao conectar: ' + result.message);
+                    }
                 }
-            } catch (error) { console.error(error); alert('Erro ao conectar.'); }
+            } catch (error) {
+                console.error('Erro ao conectar com a MetaMask:', error);
+                alert('Ocorreu um erro ao tentar conectar com a MetaMask.');
+            }
         });
     }
 
+    // --- LÓGICA DO BOTÃO DE REIVINDICAÇÃO ---
     const btnReivindicar = document.getElementById('btnReivindicar');
     if (btnReivindicar) {
         btnReivindicar.addEventListener('click', async () => {
@@ -133,15 +175,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const response = await fetch('/api/reivindicar-creditos', { method: 'POST' });
                 const result = await response.json();
                 if (result.success) {
-                    alert(`Sucesso! ${result.message}\nConsulte a transação: https://sepolia.etherscan.io/tx/${result.tx_hash}`);
+                    alert(`Sucesso! ${result.message}\nConsulte a transação no Etherscan.`);
                     window.location.reload(); 
                 } else {
-                    alert(`Erro: ${result.message}`);
+                    alert(`Erro ao reivindicar: ${result.message}`);
                 }
             } catch (error) {
-                console.error(error);
-                alert('Erro de comunicação.');
+                console.error('Erro no fetch de reivindicação:', error);
+                alert('Erro de comunicação com o servidor.');
             } finally {
+                // Readicionar o botão só é necessário se a página não recarregar
+                // Mas como recarregamos em ambos os casos, este 'finally' é menos crítico
                 btnReivindicar.disabled = false;
                 btnReivindicar.innerHTML = '<i class="fas fa-gift me-2"></i>Reivindicar GreenCoins';
             }
