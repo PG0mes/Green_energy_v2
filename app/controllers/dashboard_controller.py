@@ -62,17 +62,28 @@ class DashboardController:
     def calcular_metricas_gerais(fonte_id):
         """Calcula métricas gerais para o dashboard, incluindo GERAÇÃO e CONSUMO."""
         if not PANDAS_AVAILABLE:
-            return DashboardController._gerar_metricas_ficticias()
-            
+            # Retorna dados fictícios se o pandas não estiver disponível
+            metricas_ficticias = DashboardController._gerar_metricas_ficticias()
+            metricas_ficticias.update({
+                'consumo_total': round(metricas_ficticias['total_energia'] * 0.8, 2),
+                'consumo_medio_diario': round(metricas_ficticias['media_diaria'] * 0.8, 2)
+            })
+            return metricas_ficticias
+
         df = DashboardController.get_dados_fonte(fonte_id)
-        
+
         if df is None or df.empty:
-            return DashboardController._gerar_metricas_ficticias()
-        
+            metricas_ficticias = DashboardController._gerar_metricas_ficticias()
+            metricas_ficticias.update({
+                'consumo_total': round(metricas_ficticias['total_energia'] * 0.8, 2),
+                'consumo_medio_diario': round(metricas_ficticias['media_diaria'] * 0.8, 2)
+            })
+            return metricas_ficticias
+
         # --- Métricas de GERAÇÃO (já existentes) ---
         total_energia = df['energia_kwh'].sum()
         potencia_maxima = df['potencia_kw'].max()
-        
+
         df['data'] = pd.to_datetime(df['data_hora']).dt.date
         energia_por_dia = df.groupby('data')['energia_kwh'].sum()
         media_diaria = energia_por_dia.mean()
@@ -85,7 +96,7 @@ class DashboardController:
         consumo_total = total_energia * 0.8 * random.uniform(0.95, 1.05)
         consumo_medio_diario = media_diaria * 0.8 * random.uniform(0.95, 1.05)
         # ---------------------------------------------------------
-        
+
         return {
             'total_energia': round(total_energia, 2),
             'potencia_maxima': round(potencia_maxima, 2),
@@ -96,7 +107,6 @@ class DashboardController:
             # --- NOVAS MÉTRICAS DE CONSUMO ---
             'consumo_total': round(consumo_total, 2),
             'consumo_medio_diario': round(consumo_medio_diario, 2),
-            'consumo_por_tipo': "N/A" # Deixamos como "Não Aplicável" por enquanto
         }
     
     @staticmethod

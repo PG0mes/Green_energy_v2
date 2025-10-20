@@ -3,17 +3,26 @@
 {% block title %}Dashboard - {{ fonte.nome }}{% endblock %}
 
 {% block content %}
-<nav class="mb-6 text-sm" aria-label="breadcrumb">
-    <ol class="flex items-center space-x-2 text-gray-500">
-        <li>
-            <a href="{{ url_for('main.index') }}" class="hover:text-green-600">Início</a>
-        </li>
-        <li>
-            <span class="mx-2">/</span>
-        </li>
-        <li class="font-semibold text-gray-700" aria-current="page">Dashboard - {{ fonte.nome }}</li>
-    </ol>
-</nav>
+<div class="border-b border-gray-200">
+    <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+        <button class="dashboard-tab-btn active group" data-tab="producao">
+            <i class="fas fa-solar-panel mr-2"></i>
+            <span>Produção</span>
+        </button>
+        <button class="dashboard-tab-btn group" data-tab="consumo">
+            <i class="fas fa-bolt mr-2"></i>
+            <span>Consumo</span>
+        </button>
+        <button class="dashboard-tab-btn group" data-tab="alertas">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span>Alertas</span>
+        </button>
+        <button class="dashboard-tab-btn group" data-tab="excedente">
+            <i class="fas fa-coins mr-2"></i>
+            <span>Excedente</span>
+        </button>
+    </nav>
+</div>
 
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Dashboard: {{ fonte.nome }}</h1>
@@ -70,159 +79,159 @@
     </div>
 </div>
 
-<div class="mb-8 border-b border-gray-200">
-    <nav class="flex space-x-4" aria-label="Tabs">
-        <button class="dashboard-tab-btn active" data-tab="producao">
-            <i class="fas fa-solar-panel mr-2"></i>Produção
-        </button>
-        <button class="dashboard-tab-btn" data-tab="consumo">
-            <i class="fas fa-bolt mr-2"></i>Consumo
-        </button>
-        <button class="dashboard-tab-btn" data-tab="alertas">
-            <i class="fas fa-exclamation-triangle mr-2"></i>Alertas
-        </button>
-        <button class="dashboard-tab-btn" data-tab="excedente">
-            <i class="fas fa-coins mr-2"></i>Excedente
-        </button>
-    </nav>
+<div class="bg-white rounded-lg shadow-lg">
+    <div class="border-b border-gray-200">
+        <nav class="flex space-x-2 p-4" aria-label="Tabs">
+            <button class="dashboard-tab-btn active" data-tab="producao">
+                <i class="fas fa-solar-panel mr-2"></i>Produção
+            </button>
+            <button class="dashboard-tab-btn" data-tab="consumo">
+                <i class="fas fa-bolt mr-2"></i>Consumo
+            </button>
+            <button class="dashboard-tab-btn" data-tab="alertas">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Alertas
+            </button>
+            <button class="dashboard-tab-btn" data-tab="excedente">
+                <i class="fas fa-coins mr-2"></i>Excedente
+            </button>
+        </nav>
+    </div>
+
+    <div class="p-6">
+        <div id="tab-producao" class="dashboard-tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
+                    <div class="text-4xl font-bold text-green-600">{{ metricas.total_energia }} kWh</div>
+                    <div class="text-gray-500 mt-1">Total de Energia Gerada</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
+                    <div class="text-4xl font-bold text-green-600">{{ metricas.media_diaria }} kWh</div>
+                    <div class="text-gray-500 mt-1">Média Diária</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
+                    <div class="text-4xl font-bold text-green-600">{{ metricas.potencia_maxima }} kW</div>
+                    <div class="text-gray-500 mt-1">Pico de Potência</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3">
+                    <h5 class="font-bold text-lg mb-2">Produção Diária (kWh)</h5>
+                    <div class="relative h-72"><canvas id="graficoProducaoDiaria"></canvas></div>
+                </div>
+                <div class="lg:col-span-2">
+                    <h5 class="font-bold text-lg mb-2">Produção por Hora (kW)</h5>
+                    <div class="relative h-72"><canvas id="graficoProducaoHoraria"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-consumo" class="dashboard-tab-content hidden">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
+                    <div class="text-4xl font-bold text-blue-600">{{ metricas.consumo_total or '--' }} kWh</div>
+                    <div class="text-gray-500 mt-1">Consumo Total Simulado</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
+                    <div class="text-4xl font-bold text-blue-600">{{ metricas.consumo_medio_diario or '--' }} kWh</div>
+                    <div class="text-gray-500 mt-1">Consumo Médio Diário</div>
+                </div>
+            </div>
+            <div>
+                <h5 class="font-bold text-lg mb-2">Consumo Diário Simulado (kWh)</h5>
+                <div class="relative h-72"><canvas id="graficoConsumoDiario"></canvas></div>
+            </div>
+        </div>
+
+        <div id="tab-alertas" class="dashboard-tab-content hidden">
+            {% if alertas_ativos %}
+            <div class="space-y-4">
+                {% for alerta in alertas_ativos %}
+                <div class="bg-white rounded-lg shadow-md p-5 flex items-start space-x-4 border-l-4 
+                    {% if alerta.tipo == 'crítico' %} border-red-500 
+                    {% else %} border-yellow-400 {% endif %}">
+                    <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full
+                        {% if alerta.tipo == 'crítico' %} bg-red-100 text-red-500
+                        {% else %} bg-yellow-100 text-yellow-500 {% endif %}">
+                        <i class="fas {% if alerta.tipo == 'crítico' %}fa-exclamation-circle fa-lg{% else %}fa-exclamation-triangle fa-lg{% endif %}"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <p class="font-bold text-gray-800">{{ alerta.tipo|title }}</p>
+                        <p class="text-gray-600 mb-2">{{ alerta.mensagem }}</p>
+                        <small class="text-gray-400"><i class="far fa-clock mr-1"></i>Detectado em {{ alerta.data_criacao }}</small>
+                    </div>
+                    <form action="{{ url_for('main.resolver_alerta', fonte_id=fonte.id, alerta_id=alerta.id) }}" method="POST" class="flex-shrink-0">
+                        <button type="submit" class="bg-green-100 text-green-700 text-xs font-semibold py-2 px-3 rounded-lg hover:bg-green-200 transition-colors">
+                            <i class="fas fa-check mr-1"></i> Marcar como Resolvido
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center p-12 bg-green-50 rounded-lg border border-green-200">
+                <i class="fas fa-check-circle fa-3x text-green-400 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700">Tudo Certo por Aqui!</h3>
+                <p class="text-gray-500">Nenhum alerta ativo para esta fonte de energia no momento.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div id="tab-excedente" class="dashboard-tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gray-50 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-green-600">{{ detalhes_calculo.producao }} kWh</div>
+                    <div class="text-gray-500 mt-1">Energia Gerada</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-red-500">{{ detalhes_calculo.consumo }} kWh</div>
+                    <div class="text-gray-500 mt-1">Energia Consumida</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-blue-500">{{ detalhes_calculo.excedente }} kWh</div>
+                    <div class="text-gray-500 mt-1">Excedente Gerado</div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                <h5 class="font-bold text-lg mb-4">Detalhes do Cálculo</h5>
+                <div class="text-sm text-gray-700 space-y-2">
+                    <p><strong>Fórmula:</strong> <code class="text-xs bg-gray-100 p-1 rounded">excedente = max(0, produção - consumo)</code></p>
+                    {% if detalhes_calculo and detalhes_calculo.passos %}
+                    <p class="font-semibold"><strong>Passo a passo:</strong></p>
+                    <ul class="list-disc list-inside space-y-1">
+                        {% for passo in detalhes_calculo.passos %}
+                        <li>{{ passo }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div>
-    <div id="tab-producao" class="dashboard-tab-content">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
-                <div class="text-4xl font-bold text-green-600">{{ metricas.total_energia }} kWh</div>
-                <div class="text-gray-500 mt-1">Total de Energia Gerada</div>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
-                <div class="text-4xl font-bold text-green-600">{{ metricas.media_diaria }} kWh</div>
-                <div class="text-gray-500 mt-1">Média Diária</div>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6 text-center transition-transform hover:-translate-y-1">
-                <div class="text-4xl font-bold text-green-600">{{ metricas.potencia_maxima }} kW</div>
-                <div class="text-gray-500 mt-1">Pico de Potência</div>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-lg">
-                <h5 class="font-bold text-lg mb-4">Produção Diária (kWh)</h5>
-                <div class="relative h-72">
-                    <canvas id="graficoProducaoDiaria"></canvas>
-                </div>
-            </div>
-            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
-                <h5 class="font-bold text-lg mb-4">Produção por Hora (kW)</h5>
-                <div class="relative h-72">
-                    <canvas id="graficoProducaoHoraria"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-consumo" class="dashboard-tab-content hidden">
-        <div class="text-center p-12 bg-gray-50 rounded-lg">
-            <i class="fas fa-cogs fa-3x text-gray-400 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-700">Módulo em Desenvolvimento</h3>
-            <p class="text-gray-500">A funcionalidade de monitoramento de consumo será implementada em breve.</p>
-        </div>
-    </div>
-
-    <div id="tab-alertas" class="dashboard-tab-content hidden">
-        {% if alertas_ativos %}
-        <div class="space-y-4">
-            {% for alerta in alertas_ativos %}
-            <div class="bg-white rounded-lg shadow-md p-5 flex items-start space-x-4 border-l-4 
-                {% if alerta.tipo == 'crítico' %} border-red-500 {% else %} border-yellow-400 {% endif %}">
-                <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full
-                    {% if alerta.tipo == 'crítico' %} bg-red-100 text-red-500
-                    {% else %} bg-yellow-100 text-yellow-500 {% endif %}">
-                    <i class="fas {% if alerta.tipo == 'crítico' %}fa-exclamation-circle fa-lg{% else %}fa-exclamation-triangle fa-lg{% endif %}"></i>
-                </div>
-                <div class="flex-grow">
-                    <p class="font-bold text-gray-800">{{ alerta.tipo|title }}</p>
-                    <p class="text-gray-600 mb-2">{{ alerta.mensagem }}</p>
-                    <small class="text-gray-400"><i class="far fa-clock mr-1"></i>Detectado em {{ alerta.data_criacao }}</small>
-                </div>
-                <form action="{{ url_for('main.resolver_alerta', fonte_id=fonte.id, alerta_id=alerta.id) }}" method="POST" class="flex-shrink-0">
-                    <button type="submit" class="bg-green-100 text-green-700 text-xs font-semibold py-2 px-3 rounded-lg hover:bg-green-200 transition-colors">
-                        <i class="fas fa-check mr-1"></i> Marcar como Resolvido
-                    </button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center p-12 bg-green-50 rounded-lg border border-green-200">
-            <i class="fas fa-check-circle fa-3x text-green-400 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-700">Tudo Certo por Aqui!</h3>
-            <p class="text-gray-500">Nenhum alerta ativo para esta fonte de energia no momento.</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <div id="tab-excedente" class="dashboard-tab-content hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gray-50 rounded-lg p-6 text-center">
-                <div class="text-4xl font-bold text-green-600">{{ detalhes_calculo.producao }} kWh</div>
-                <div class="text-gray-500 mt-1">Energia Gerada</div>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6 text-center">
-                <div class="text-4xl font-bold text-red-500">{{ detalhes_calculo.consumo }} kWh</div>
-                <div class="text-gray-500 mt-1">Energia Consumida</div>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6 text-center">
-                <div class="text-4xl font-bold text-blue-500">{{ detalhes_calculo.excedente }} kWh</div>
-                <div class="text-gray-500 mt-1">Excedente Gerado</div>
-            </div>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h5 class="font-bold text-lg mb-4">Detalhes do Cálculo</h5>
-            <div class="text-sm text-gray-700 space-y-2">
-                <p><strong>Fórmula:</strong> <code class="text-xs bg-gray-100 p-1 rounded">excedente = max(0, produção - consumo)</code></p>
-                {% if detalhes_calculo and detalhes_calculo.passos %}
-                <p class="font-semibold"><strong>Passo a passo:</strong></p>
-                <ul class="list-disc list-inside space-y-1">
-                    {% for passo in detalhes_calculo.passos %}
-                    <li>{{ passo }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* Estilos para as abas ativas e inativas */
-.dashboard-tab-btn {
-    @apply py-3 px-4 font-semibold text-gray-500 border-b-2 border-transparent hover:border-green-500 hover:text-green-600 transition-colors;
-}
-.dashboard-tab-btn.active {
-    @apply text-green-600 border-green-600;
-}
-</style>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Sistema de abas
-    const tabButtons = document.querySelectorAll('.dashboard-tab-btn');
-    const tabContents = document.querySelectorAll('.dashboard-tab-content');
+    document.addEventListener('DOMContentLoaded', function() {
+// Sistema de abas
+const tabButtons = document.querySelectorAll('.dashboard-tab-btn');
+const tabContents = document.querySelectorAll('.dashboard-tab-content');
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            const targetTab = document.getElementById('tab-' + button.dataset.tab);
-            tabContents.forEach(content => content.classList.add('hidden'));
-            if (targetTab) {
-                targetTab.classList.remove('hidden');
-            }
-        });
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove a classe 'active' de todos os botões
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        // Adiciona 'active' apenas no botão clicado
+        button.classList.add('active');
+
+        // Mostra o conteúdo da aba correspondente
+        const targetTab = document.getElementById('tab-' + button.dataset.tab);
+        tabContents.forEach(content => content.classList.add('hidden'));
+        if (targetTab) {
+            targetTab.classList.remove('hidden');
+        }
     });
-
+});
     // Função para tratar erros nos gráficos
     function showChartError(elementId, message) {
         const canvas = document.getElementById(elementId);
@@ -230,16 +239,19 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = `<div class="h-full flex items-center justify-center text-red-500 bg-red-50 p-4 rounded-lg"><i class="fas fa-exclamation-circle mr-2"></i>${message}</div>`;
     }
 
-    // Gráfico de Produção Diária
+    // Gráfico de Produção Diária e Consumo
     fetch('/api/fonte/{{ fonte.id }}/producao-diaria')
         .then(response => response.json())
         .then(data => {
             if (!data || data.length === 0) {
                 showChartError('graficoProducaoDiaria', 'Sem dados de produção. Importe ou gere dados simulados.');
+                showChartError('graficoConsumoDiario', 'Sem dados de consumo.');
                 return;
             }
-            const ctx = document.getElementById('graficoProducaoDiaria').getContext('2d');
-            new Chart(ctx, {
+            
+            // Gráfico de Produção
+            const ctxProducao = document.getElementById('graficoProducaoDiaria').getContext('2d');
+            new Chart(ctxProducao, {
                 type: 'bar',
                 data: {
                     labels: data.map(item => item.data),
@@ -253,10 +265,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
             });
+            
+            // Gráfico de Consumo (Simulado)
+            const consumoData = data.map(item => ({...item, consumo: (item.energia * 0.8 * (Math.random() * (1.1 - 0.9) + 0.9)).toFixed(2) })); // 80% da geração com +/- 10% de variação
+            const ctxConsumo = document.getElementById('graficoConsumoDiario').getContext('2d');
+            new Chart(ctxConsumo, {
+                type: 'bar',
+                data: {
+                    labels: consumoData.map(item => item.data),
+                    datasets: [{
+                        label: 'Consumo Simulado (kWh)',
+                        data: consumoData.map(item => item.consumo),
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            });
+
         })
         .catch(error => {
             console.error('Erro ao carregar dados diários:', error);
             showChartError('graficoProducaoDiaria', 'Erro ao carregar dados. Tente novamente.');
+            showChartError('graficoConsumoDiario', 'Erro ao carregar dados.');
         });
 
     // Gráfico de Produção Horária
