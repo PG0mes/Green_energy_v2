@@ -1,0 +1,27 @@
+{
+  "name": "green_energy_v2",
+  "version": "1.0.0",
+  "description": "Um sistema de gerenciamento de energia solar desenvolvido com Flask, projetado para monitorar, analisar e prever a produção de fontes de energia limpa. A aplicação permite o cadastro e acompanhamento de placas solares, análise de performance, importação de dados e previsões de geração, ajudando usuários a otimizar o uso de sua energia.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "tailwindcss -i ./app/static/src/input.css -o ./app/static/css/main.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PG0mes/Green_energy_v2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/PG0mes/Green_energy_v2/issues"
+  },
+  "homepage": "https://github.com/PG0mes/Green_energy_v2#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18"
+  }
+}

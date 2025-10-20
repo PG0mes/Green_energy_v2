@@ -2,132 +2,99 @@
 
 {% block title %}Créditos Solares{% endblock %}
 
-{% block extra_css %}
-<style>
-    .card-metric { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .status-processed a {
-        background-color: #e9f7ef;
-        color: #28a745;
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-weight: 500;
-        text-decoration: none;
-        transition: background-color 0.2s;
-    }
-    .status-processed a:hover {
-        background-color: #d1fae5;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="row mb-3">
-    <div class="col-12">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Início</a></li>
-                <li class="breadcrumb-item active">Créditos Solares</li>
-            </ol>
-        </nav>
+<nav class="mb-6 text-sm" aria-label="breadcrumb">
+    <ol class="flex items-center space-x-2 text-gray-500">
+        <li>
+            <a href="{{ url_for('main.index') }}" class="hover:text-green-600">Início</a>
+        </li>
+        <li>
+            <span class="mx-2">/</span>
+        </li>
+        <li class="font-semibold text-gray-700" aria-current="page">Créditos Solares</li>
+    </ol>
+</nav>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center"><i class="fas fa-coins mr-3 text-green-500"></i>Saldo</h4>
+        
+        <div class="mb-4">
+            <span class="text-4xl font-bold text-green-600">{{ "%.4f"|format(gec_balance) }}</span>
+            <span class="ml-2 text-gray-600">GreenCoin (na carteira)</span>
+        </div>
+        
+        <div>
+            <span class="text-2xl font-semibold text-gray-800">{{ "%.2f"|format(excedente_a_reivindicar) }}</span>
+            <span class="ml-2 text-gray-600">kWh Excedente (a reivindicar)</span>
+        </div>
+
+        {% if wallet_address %}
+            {% if excedente_a_reivindicar > 0 %}
+                <button id="btnReivindicar" class="mt-6 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-300 flex items-center justify-center">
+                    <i class="fas fa-gift mr-2"></i>Reivindicar {{ "%.2f"|format(excedente_a_reivindicar) }} GEC
+                </button>
+            {% else %}
+                <p class="mt-6 text-green-600 font-semibold"><i class="fas fa-check-circle mr-2"></i>Você está em dia! Nenhum crédito pendente.</p>
+            {% endif %}
+        {% else %}
+            <p class="mt-6 text-sm text-gray-500">Conecte sua carteira para poder reivindicar.</p>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between">
+        <div>
+            <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center"><i class="fas fa-info-circle mr-3 text-blue-500"></i>Conexão</h4>
+            <p class="text-gray-700">1 kWh de Excedente = 1 GreenCoin</p>
+        </div>
+        <div>
+            {% if wallet_address %}
+                <div class="mt-4 bg-green-100 border border-green-300 text-green-800 text-sm rounded-lg p-3">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Conectado com: <strong class="font-mono">{{ wallet_address[:6] }}...{{ wallet_address[-4:] }}</strong>
+                </div>
+            {% else %}
+                <button id="btnConnectMetamask" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center">
+                    <i class="fas fa-wallet mr-2"></i>Conectar com a Metamask
+                </button>
+            {% endif %}
+        </div>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6 mb-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h4 class="card-title mb-3"><i class="fas fa-coins me-2 text-success"></i>Saldo</h4>
-                
-                <div class="mb-2">
-                    <span class="h2 text-success">{{ "%.4f"|format(gec_balance) }}</span>
-                    <span class="ms-1">GreenCoin (na carteira)</span>
-                </div>
-                
-                <div>
-                    <span class="h5">{{ "%.2f"|format(excedente_a_reivindicar) }}</span>
-                    <span class="ms-1">kWh Excedente (a reivindicar)</span>
-                </div>
-
-                {% if wallet_address %}
-                    {% if excedente_a_reivindicar > 0 %}
-                        <button class="btn btn-success mt-3" id="btnReivindicar">
-                            <i class="fas fa-gift me-2"></i>Reivindicar {{ "%.2f"|format(excedente_a_reivindicar) }} GEC
-                        </button>
-                    {% else %}
-                        <p class="text-success mt-3"><i class="fas fa-check-circle me-2"></i>Você está em dia! Nenhum crédito pendente.</p>
-                    {% endif %}
+<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-green-600 text-white p-4">
+        <h5 class="font-bold text-lg flex items-center"><i class="fas fa-history mr-3"></i>Histórico de Transações</h5>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-600">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3">Data</th>
+                    <th scope="col" class="px-6 py-3">kWh Reivindicado</th>
+                    <th scope="col" class="px-6 py-3">GEC Recebido</th>
+                    <th scope="col" class="px-6 py-3">Status / Transação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transacoes | reverse %}
+                <tr class="bg-white border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">{{ t.data }}</td>
+                    <td class="px-6 py-4">{{ t.kwh_excedente }}</td>
+                    <td class="px-6 py-4">{{ t.gec_recebido }}</td>
+                    <td class="px-6 py-4">
+                        <a href="https://sepolia.etherscan.io/tx/{{ t.tx_hash }}" target="_blank" title="Ver no Etherscan" class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full hover:bg-green-200 transition-colors">
+                            {{ t.status }} <i class="fas fa-external-link-alt ml-1"></i>
+                        </a>
+                    </td>
+                </tr>
                 {% else %}
-                    <p class="text-muted mt-3"><small>Conecte sua carteira para poder reivindicar.</small></p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 mb-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <div>
-                    <h4 class="card-title mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Conexão</h4>
-                    <p>1 kWh de Excedente = 1 GreenCoin</p>
-                </div>
-                <div>
-                    {% if wallet_address %}
-                        <div class="alert alert-success mt-3">
-                            <i class="fas fa-check-circle me-1"></i>
-                            Conectado com: <strong class="font-monospace">{{ wallet_address[:6] }}...{{ wallet_address[-4:] }}</strong>
-                        </div>
-                    {% else %}
-                        <button class="btn btn-primary mt-3" id="btnConnectMetamask">
-                            <i class="fas fa-wallet me-2"></i>Conectar com a Metamask
-                        </button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Histórico de Transações</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Data</th>
-                                <th>kWh Reivindicado</th>
-                                <th>GEC Recebido</th>
-                                <th>Status / Transação</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for t in transacoes | reverse %}
-                            <tr>
-                                <td>{{ t.data }}</td>
-                                <td>{{ t.kwh_excedente }}</td>
-                                <td>{{ t.gec_recebido }}</td>
-                                <td>
-                                    <span class="status-processed">
-                                        <a href="https://sepolia.etherscan.io/tx/{{ t.tx_hash }}" target="_blank" title="Ver no Etherscan">
-                                            {{ t.status }} <i class="fas fa-external-link-alt ms-1"></i>
-                                        </a>
-                                    </span>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted p-4">Nenhuma transação de reivindicação encontrada.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                <tr>
+                    <td colspan="4" class="text-center text-gray-500 py-8">Nenhuma transação de reivindicação encontrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
@@ -170,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnReivindicar) {
         btnReivindicar.addEventListener('click', async () => {
             btnReivindicar.disabled = true;
-            btnReivindicar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processando...';
+            btnReivindicar.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processando...`;
             try {
                 const response = await fetch('/api/reivindicar-creditos', { method: 'POST' });
                 const result = await response.json();
@@ -184,8 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Erro no fetch de reivindicação:', error);
                 alert('Erro de comunicação com o servidor.');
             } finally {
-                // Readicionar o botão só é necessário se a página não recarregar
-                // Mas como recarregamos em ambos os casos, este 'finally' é menos crítico
                 btnReivindicar.disabled = false;
                 btnReivindicar.innerHTML = '<i class="fas fa-gift me-2"></i>Reivindicar GreenCoins';
             }

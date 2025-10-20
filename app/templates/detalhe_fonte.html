@@ -3,54 +3,61 @@
 {% block title %}GreenEnergy - Detalhes da Fonte{% endblock %}
 
 {% block content %}
-<div class="row mb-3">
-    <div class="col-12">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Início</a></li>
-                <li class="breadcrumb-item active">Detalhes - {{ fonte.nome }}</li>
-            </ol>
-        </nav>
-    </div>
-</div>
+<nav class="mb-6 text-sm" aria-label="breadcrumb">
+    <ol class="flex items-center space-x-2 text-gray-500">
+        <li>
+            <a href="{{ url_for('main.index') }}" class="hover:text-green-600">Início</a>
+        </li>
+        <li>
+            <span class="mx-2">/</span>
+        </li>
+        <li class="font-semibold text-gray-700" aria-current="page">Detalhes - {{ fonte.nome }}</li>
+    </ol>
+</nav>
 
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title mb-0">{{ fonte.nome }}</h2>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h5>Informações Gerais</h5>
+<div class="flex justify-center">
+    <div class="w-full max-w-4xl bg-white rounded-lg shadow-xl my-8 overflow-hidden">
+        
+        <div class="bg-blue-600 text-white p-6">
+            <h2 class="text-3xl font-bold">{{ fonte.nome }}</h2>
+        </div>
+
+        <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+                <div>
+                    <h5 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Informações Gerais</h5>
+                    <div class="space-y-3 text-gray-700">
                         <p><strong>Localização:</strong> {{ fonte.localizacao }}</p>
                         <p><strong>Capacidade Instalada:</strong> {{ fonte.capacidade }} kWp</p>
                         <p><strong>Data de Instalação:</strong> {{ fonte.data_instalacao }}</p>
                     </div>
-                    <div class="col-md-6">
-                        <h5>Informações Técnicas</h5>
+                </div>
+                <div>
+                    <h5 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Informações Técnicas</h5>
+                    <div class="space-y-3 text-gray-700">
                         <p><strong>Marca do Inversor:</strong> {{ fonte.marca }}</p>
                         <p><strong>Modelo do Inversor:</strong> {{ fonte.modelo }}</p>
-                        <p><strong>ID da Fonte:</strong> {{ fonte.id }}</p>
+                        <p><strong>ID da Fonte:</strong> <span class="font-mono bg-gray-100 px-2 py-1 rounded">{{ fonte.id }}</span></p>
                     </div>
                 </div>
-                
-                <div class="d-flex justify-content-between">
-                    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Voltar
+            </div>
+            
+            <hr class="my-8">
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <a href="{{ url_for('main.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-colors w-full md:w-auto">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </a>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ url_for('main.editar_fonte', fonte_id=fonte.id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-edit mr-2"></i> Editar
                     </a>
-                    <div>
-                        <a href="{{ url_for('main.editar_fonte', fonte_id=fonte.id) }}" class="btn btn-primary">
-                            <i class="fas fa-edit me-1"></i> Editar
-                        </a>
-                        <a href="{{ url_for('main.dashboard', fonte_id=fonte.id) }}" class="btn btn-success ms-2">
-                            <i class="fas fa-chart-line me-1"></i> Dashboard
-                        </a>
-                        <a href="{{ url_for('main.importar_dados', fonte_id=fonte.id) }}" class="btn btn-warning ms-2">
-                            <i class="fas fa-file-import me-1"></i> Importar Dados
-                        </a>
-                    </div>
+                    <a href="{{ url_for('main.importar_dados', fonte_id=fonte.id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-file-import mr-2"></i> Importar Dados
+                    </a>
+                    <a href="{{ url_for('main.dashboard', fonte_id=fonte.id) }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i> Ir para o Dashboard
+                    </a>
                 </div>
             </div>
         </div>

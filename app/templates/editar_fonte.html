@@ -3,114 +3,106 @@
 {% block title %}GreenEnergy - Editar Fonte{% endblock %}
 
 {% block content %}
-<div class="row mb-3">
-    <div class="col-12">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Início</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('main.detalhe_fonte', fonte_id=fonte.id) }}">{{ fonte.nome }}</a></li>
-                <li class="breadcrumb-item active">Editar</li>
-            </ol>
-        </nav>
-    </div>
-</div>
+<nav class="mb-6 text-sm" aria-label="breadcrumb">
+    <ol class="flex items-center space-x-2 text-gray-500">
+        <li>
+            <a href="{{ url_for('main.index') }}" class="hover:text-green-600">Início</a>
+        </li>
+        <li>
+            <span class="mx-2">/</span>
+        </li>
+        <li>
+            <a href="{{ url_for('main.detalhe_fonte', fonte_id=fonte.id) }}" class="hover:text-green-600">{{ fonte.nome }}</a>
+        </li>
+        <li>
+            <span class="mx-2">/</span>
+        </li>
+        <li class="font-semibold text-gray-700" aria-current="page">Editar</li>
+    </ol>
+</nav>
 
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h2 class="card-title mb-0">Editar Fonte de Energia</h2>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome da Instalação</label>
-                        <input type="text" class="form-control" id="nome" name="nome" value="{{ fonte.nome }}" required>
+<div class="flex justify-center">
+    <div class="w-full max-w-4xl bg-white rounded-lg shadow-xl my-8 overflow-hidden">
+        
+        <div class="bg-blue-600 text-white p-6">
+            <h2 class="text-2xl font-bold">Editar Fonte de Energia</h2>
+        </div>
+
+        <div class="p-8">
+            <form method="POST">
+                <div class="space-y-6">
+                    <div>
+                        <label for="nome" class="block text-sm font-medium text-gray-700">Nome da Instalação</label>
+                        <input type="text" id="nome" name="nome" value="{{ fonte.nome }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    
-                    <!-- Campos de Endereço com Busca CEP -->
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="cep" class="form-label">CEP</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="cep" name="cep" maxlength="9" placeholder="00000-000">
-                                <button class="btn btn-outline-primary" type="button" id="buscarCep">
-                                    <i class="fas fa-search"></i>
-                                </button>
+
+                    <div class="border-t border-gray-200 pt-6">
+                        <p class="text-lg font-semibold text-gray-800 mb-4">Localização</p>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="md:col-span-1">
+                                <label for="cep" class="block text-sm font-medium text-gray-700">CEP</label>
+                                <div class="flex mt-1">
+                                    <input type="text" id="cep" name="cep" maxlength="9" placeholder="00000-000" class="flex-grow block w-full px-3 py-2 bg-white border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <button type="button" id="buscarCep" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-md transition-colors">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div id="cepFeedback" class="invalid-feedback"></div>
-                            <small class="text-muted">Preencha o CEP para buscar o endereço automaticamente</small>
+                            <div class="md:col-span-3">
+                                <label for="logradouro" class="block text-sm font-medium text-gray-700">Rua</label>
+                                <input type="text" id="logradouro" name="logradouro" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="numero" class="block text-sm font-medium text-gray-700">Número</label>
+                                <input type="text" id="numero" name="numero" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label for="bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
+                                <input type="text" id="bairro" name="bairro" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label for="cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
+                                <input type="text" id="cidade" name="cidade" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="uf" class="block text-sm font-medium text-gray-700">Estado</label>
+                                <input type="text" id="uf" name="uf" maxlength="2" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div class="md:col-span-4">
+                                <label for="localizacao" class="block text-sm font-medium text-gray-700">Endereço Completo (gerado automaticamente)</label>
+                                <input type="text" id="localizacao" name="localizacao" value="{{ fonte.localizacao }}" required class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-10 mb-3">
-                            <label for="logradouro" class="form-label">Rua</label>
-                            <input type="text" class="form-control" id="logradouro" name="logradouro">
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label for="numero" class="form-label">Número</label>
-                            <input type="text" class="form-control" id="numero" name="numero">
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="complemento" class="form-label">Complemento</label>
-                            <input type="text" class="form-control" id="complemento" name="complemento">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="bairro" class="form-label">Bairro</label>
-                            <input type="text" class="form-control" id="bairro" name="bairro">
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-8">
-                            <label for="cidade" class="form-label">Cidade</label>
-                            <input type="text" class="form-control" id="cidade" name="cidade">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="uf" class="form-label">Estado</label>
-                            <input type="text" class="form-control" id="uf" name="uf" maxlength="2">
+                    <div class="border-t border-gray-200 pt-6">
+                        <p class="text-lg font-semibold text-gray-800 mb-4">Informações Técnicas</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="capacidade" class="block text-sm font-medium text-gray-700">Capacidade Instalada (kWp)</label>
+                                <input type="number" step="0.01" id="capacidade" name="capacidade" value="{{ fonte.capacidade }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="data_instalacao" class="block text-sm font-medium text-gray-700">Data de Instalação</label>
+                                <input type="date" id="data_instalacao" name="data_instalacao" value="{{ fonte.data_instalacao }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="marca" class="block text-sm font-medium text-gray-700">Marca do Inversor</label>
+                                <input type="text" id="marca" name="marca" value="{{ fonte.marca }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo do Inversor</label>
+                                <input type="text" id="modelo" name="modelo" value="{{ fonte.modelo }}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Campo de endereço completo -->
-                    <div class="mb-3">
-                        <label for="localizacao" class="form-label">Endereço Completo</label>
-                        <input type="text" class="form-control" id="localizacao" name="localizacao" value="{{ fonte.localizacao }}" required>
-                        <small class="text-muted">Este campo será preenchido automaticamente ao completar os campos acima, ou você pode editar diretamente</small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="capacidade" class="form-label">Capacidade Instalada (kWp)</label>
-                        <input type="number" step="0.01" class="form-control" id="capacidade" name="capacidade" value="{{ fonte.capacidade }}" required>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="marca" class="form-label">Marca do Inversor</label>
-                            <input type="text" class="form-control" id="marca" name="marca" value="{{ fonte.marca }}" required>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="modelo" class="form-label">Modelo do Inversor</label>
-                            <input type="text" class="form-control" id="modelo" name="modelo" value="{{ fonte.modelo }}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="data_instalacao" class="form-label">Data de Instalação</label>
-                        <input type="date" class="form-control" id="data_instalacao" name="data_instalacao" value="{{ fonte.data_instalacao }}" required>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('main.detalhe_fonte', fonte_id=fonte.id) }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                    <a href="{{ url_for('main.detalhe_fonte', fonte_id=fonte.id) }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-colors">Cancelar</a>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Salvar Alterações</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -119,132 +111,72 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tentar extrair partes do endereço do campo de localização
+        // Lógica para preencher os campos de endereço a partir do campo 'localizacao'
         const localizacaoAtual = document.getElementById('localizacao').value;
         if (localizacaoAtual) {
-            // Lógica básica para tentar separar o endereço (isso pode variar conforme o formato exato)
-            const partes = localizacaoAtual.split(',');
-            if (partes.length >= 3) {
-                // Assumindo formato: Rua, Número - Complemento, Bairro, Cidade - UF
-                const ruaNumero = partes[0].trim().split(' - ');
-                
-                // Logradouro e número
-                const ruaNumArr = ruaNumero[0].trim().split(/,\s*/);
-                if (ruaNumArr.length > 1) {
-                    document.getElementById('logradouro').value = ruaNumArr[0];
-                    document.getElementById('numero').value = ruaNumArr[1];
-                }
-                
-                // Complemento
-                if (ruaNumero.length > 1) {
-                    document.getElementById('complemento').value = ruaNumero[1];
-                }
-                
-                // Bairro
-                if (partes.length > 1) {
-                    document.getElementById('bairro').value = partes[1].trim();
-                }
-                
-                // Cidade e UF
-                if (partes.length > 2) {
-                    const cidadeUF = partes[2].trim().split(' - ');
-                    document.getElementById('cidade').value = cidadeUF[0];
-                    if (cidadeUF.length > 1) {
-                        document.getElementById('uf').value = cidadeUF[1];
-                    }
+            const partes = localizacaoAtual.split(',').map(p => p.trim());
+            if (partes.length > 2) {
+                document.getElementById('logradouro').value = partes[0] || '';
+                document.getElementById('numero').value = partes[1] || '';
+                document.getElementById('bairro').value = partes[2] || '';
+                if (partes[3]) {
+                    const cidadeUf = partes[3].split('-').map(p => p.trim());
+                    document.getElementById('cidade').value = cidadeUf[0] || '';
+                    document.getElementById('uf').value = cidadeUf[1] || '';
                 }
             }
         }
         
-        // Máscara para o CEP
+        // Máscara e busca de CEP (código mantido)
         const cepInput = document.getElementById('cep');
         cepInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Remove não-dígitos
+            let value = e.target.value.replace(/\D/g, '');
             if (value.length > 5) {
                 value = value.substring(0, 5) + '-' + value.substring(5, 8);
             }
             e.target.value = value;
         });
-        
-        // Busca de CEP
+
         const buscarCepBtn = document.getElementById('buscarCep');
         buscarCepBtn.addEventListener('click', function() {
             const cep = cepInput.value.replace(/\D/g, '');
-            
-            if (cep.length !== 8) {
-                showCepError('CEP inválido. Informe os 8 dígitos.');
-                return;
-            }
-            
-            // Mostrar feedback de carregamento
-            buscarCepBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            if (cep.length !== 8) return;
+
+            buscarCepBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             buscarCepBtn.disabled = true;
-            
+
             fetch(`https://viacep.com.br/ws/${cep}/json/`)
                 .then(response => response.json())
                 .then(data => {
-                    buscarCepBtn.innerHTML = '<i class="fas fa-search"></i>';
-                    buscarCepBtn.disabled = false;
-                    
-                    if (data.erro) {
-                        showCepError('CEP não encontrado.');
-                        return;
+                    if (!data.erro) {
+                        document.getElementById('logradouro').value = data.logradouro || '';
+                        document.getElementById('bairro').value = data.bairro || '';
+                        document.getElementById('cidade').value = data.localidade || '';
+                        document.getElementById('uf').value = data.uf || '';
+                        document.getElementById('numero').focus();
+                        atualizarEnderecoCompleto();
                     }
-                    
-                    // Preencher os campos do formulário
-                    document.getElementById('logradouro').value = data.logradouro || '';
-                    document.getElementById('bairro').value = data.bairro || '';
-                    document.getElementById('cidade').value = data.localidade || '';
-                    document.getElementById('uf').value = data.uf || '';
-                    
-                    // Foca no campo de número
-                    document.getElementById('numero').focus();
-                    
-                    // Atualizar o campo de endereço completo
-                    atualizarEnderecoCompleto();
-                    
-                    // Limpar feedback de erro
-                    cepInput.classList.remove('is-invalid');
                 })
-                .catch(error => {
+                .finally(() => {
                     buscarCepBtn.innerHTML = '<i class="fas fa-search"></i>';
                     buscarCepBtn.disabled = false;
-                    showCepError('Erro ao buscar CEP. Tente novamente.');
-                    console.error('Erro na busca de CEP:', error);
                 });
         });
-        
-        // Função para mostrar erro de CEP
-        function showCepError(message) {
-            const cepFeedback = document.getElementById('cepFeedback');
-            cepFeedback.textContent = message;
-            cepInput.classList.add('is-invalid');
-        }
-        
-        // Atualizar automaticamente o campo de endereço completo quando os dados mudam
-        const camposEndereco = ['logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];
-        camposEndereco.forEach(campo => {
-            document.getElementById(campo).addEventListener('input', atualizarEnderecoCompleto);
-        });
-        
+
         function atualizarEnderecoCompleto() {
             const logradouro = document.getElementById('logradouro').value;
             const numero = document.getElementById('numero').value;
-            const complemento = document.getElementById('complemento').value;
             const bairro = document.getElementById('bairro').value;
             const cidade = document.getElementById('cidade').value;
             const uf = document.getElementById('uf').value;
             
-            let endereco = '';
-            if (logradouro) endereco += logradouro;
-            if (numero) endereco += ', ' + numero;
-            if (complemento) endereco += ' - ' + complemento;
-            if (bairro) endereco += ', ' + bairro;
-            if (cidade) endereco += ', ' + cidade;
-            if (uf) endereco += ' - ' + uf;
-            
+            let endereco = [logradouro, numero, bairro, `${cidade} - ${uf}`].filter(Boolean).join(', ');
             document.getElementById('localizacao').value = endereco;
         }
+
+        ['logradouro', 'numero', 'bairro', 'cidade', 'uf'].forEach(id => {
+            document.getElementById(id).addEventListener('input', atualizarEnderecoCompleto);
+        });
     });
 </script>
 {% endblock %}

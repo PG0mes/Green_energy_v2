@@ -1,24 +1,37 @@
 {% extends "base.html" %}
 
+{% block title %}{{ titulo }}{% endblock %}
+
 {% block content %}
-<div class="content-panel">
-    <h1 class="panel-title">{{ titulo }}</h1>
-    
-    <div class="excedente-box">
-        <h2>Excedente Gerado</h2>
-        <div class="excedente-value">{{ "%.1f"|format(excedente_gerado) }} kWh</div>
-        <p class="excedente-subtitle">Total de Créditos Gerados</p>
+<div class="flex justify-center my-12">
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl text-center overflow-hidden">
+        
+        <div class="bg-green-600 p-6">
+            <h1 class="text-3xl font-bold text-white">{{ titulo }}</h1>
+        </div>
+
+        <div class="p-10">
+            <div class="bg-green-50 border-2 border-dashed border-green-200 rounded-lg p-8 mb-8">
+                <h2 class="text-lg font-semibold text-gray-600">Excedente Gerado</h2>
+                <div class="text-7xl font-extrabold text-green-600 my-2">{{ "%.1f"|format(excedente_gerado) }}</div>
+                <p class="text-gray-500">kWh de Créditos Totais</p>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Detalhes do Cálculo</h3>
+                <ul class="text-left space-y-2 text-gray-700 list-disc list-inside bg-gray-50 p-6 rounded-lg">
+                    {% for detalhe in detalhes_calculo %}
+                        <li>{{ detalhe }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 p-6 border-t border-gray-200">
+            <a href="{{ url_for('dashboard', fonte_id=fonte.id) }}" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Voltar ao Dashboard
+            </a>
+        </div>
     </div>
-    
-    <div class="detalhes-section">
-        <h3>Detalhes do Cálculo</h3>
-        <ul class="detalhes-list">
-            {% for detalhe in detalhes_calculo %}
-                <li>{{ detalhe }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-    <a href="{{ url_for('dashboard', fonte_id=fonte.id) }}" class="back-button">Voltar ao Dashboard</a>
 </div>
 {% endblock %}

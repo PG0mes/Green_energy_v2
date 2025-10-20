@@ -2,161 +2,75 @@
 
 {% block title %}GreenEnergy - Home{% endblock %}
 
-{% block extra_css %}
-<style>
-    .hero-section {
-        background: linear-gradient(135deg, #218838 0%, #28a745 100%);
-        padding: 100px 0;
-        margin-bottom: 30px;
-    }
-
-    .feature-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
-        margin-bottom: 20px;
-    }
-
-    .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .btn-floating {
-        animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
-    }
-
-    .scroll-section {
-        scroll-margin-top: 80px;
-    }
-
-    /* Centralizar conteúdo considerando sidebar */
-    .container {
-        max-width: 1100px;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section text-white">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Gerenciamento de Energia Solar</h1>
-                <p class="lead mb-4">Monitore e gerencie suas fontes de energia solar de forma eficiente e sustentável.</p>
-                <a href="{{ url_for('main.nova_fonte') }}" class="btn btn-light btn-lg btn-floating">
-                    <i class="fas fa-solar-panel me-2"></i>Começar Agora
+<section class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg">
+    <div class="container mx-auto px-6 py-24">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2">
+                <h1 class="text-5xl font-extrabold leading-tight mb-4">Gerenciamento Inteligente de Energia Solar</h1>
+                <p class="text-lg text-green-100 mb-8">Monitore, analise e otimize suas fontes de energia solar de forma eficiente e sustentável.</p>
+                <a href="{{ url_for('main.nova_fonte') }}" class="inline-block bg-white text-green-600 font-bold text-lg py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 animate-bounce">
+                    <i class="fas fa-solar-panel mr-2"></i>Começar Agora
                 </a>
             </div>
-            <div class="col-lg-6 text-center">
-                <i class="fas fa-solar-panel fa-8x text-white-50 mb-4"></i>
+            <div class="md:w-1/2 mt-12 md:mt-0 flex justify-center">
+                <i class="fas fa-solar-panel text-9xl text-green-200 opacity-50"></i>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
-<section id="features" class="scroll-section py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Funcionalidades Principais</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card feature-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Cadastro de Fontes</h5>
-                        <p class="card-text">Registre e gerencie suas fontes de energia solar.</p>
-                        <a href="{{ url_for('main.nova_fonte') }}" class="btn btn-outline-success">
-                            <i class="fas fa-arrow-right me-2"></i>Cadastrar
-                        </a>
-                    </div>
-                </div>
+<section id="features" class="py-20">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Funcionalidades Principais</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-lg shadow-xl p-8 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <i class="fas fa-plus-circle text-5xl text-green-500 mb-4"></i>
+                <h5 class="text-xl font-semibold mb-2">Cadastro de Fontes</h5>
+                <p class="text-gray-600 mb-6">Registre e gerencie suas fontes de energia solar com facilidade.</p>
+                <a href="{{ url_for('main.nova_fonte') }}" class="text-green-600 font-semibold hover:underline">
+                    Cadastrar <i class="fas fa-arrow-right ml-1"></i>
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card feature-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Dashboard</h5>
-                        <p class="card-text">Visualize métricas e análises em tempo real.</p>
-                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-success">
-                            <i class="fas fa-chart-bar me-2"></i>Visualizar
-                        </a>
-                    </div>
-                </div>
+            <div class="bg-white rounded-lg shadow-xl p-8 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <i class="fas fa-chart-line text-5xl text-green-500 mb-4"></i>
+                <h5 class="text-xl font-semibold mb-2">Dashboard Intuitivo</h5>
+                <p class="text-gray-600 mb-6">Visualize métricas e análises detalhadas em tempo real.</p>
+                <a href="{{ url_for('main.home') }}" class="text-green-600 font-semibold hover:underline">
+                    Visualizar <i class="fas fa-arrow-right ml-1"></i>
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card feature-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-file-import fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Importação de Dados</h5>
-                        <p class="card-text">Importe dados dos seus inversores Growatt.</p>
-                        <a href="#" class="btn btn-outline-success">
-                            <i class="fas fa-upload me-2"></i>Importar
-                        </a>
-                    </div>
-                </div>
+            <div class="bg-white rounded-lg shadow-xl p-8 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <i class="fas fa-file-import text-5xl text-green-500 mb-4"></i>
+                <h5 class="text-xl font-semibold mb-2">Importação de Dados</h5>
+                <p class="text-gray-600 mb-6">Importe dados de geração diretamente dos seus inversores Growatt.</p>
+                <a href="#" class="text-green-600 font-semibold hover:underline">
+                    Importar <i class="fas fa-arrow-right ml-1"></i>
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Statistics Section -->
-<section id="stats" class="scroll-section py-5 bg-light">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="display-4 text-success">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3 class="h5 mt-3">Energia Total Gerada</h3>
-                <p class="h2 text-success">123.45 kWh</p>
+<section id="stats" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+                <i class="fas fa-bolt text-5xl text-green-500"></i>
+                <p class="text-4xl font-bold text-gray-800 mt-4">123.45 kWh</p>
+                <h3 class="text-lg text-gray-500 mt-2">Energia Total Gerada</h3>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="display-4 text-success">
-                    <i class="fas fa-solar-panel"></i>
-                </div>
-                <h3 class="h5 mt-3">Fontes Ativas</h3>
-                <p class="h2 text-success">{{ fontes|length if fontes else 0 }}</p>
+            <div>
+                <i class="fas fa-solar-panel text-5xl text-green-500"></i>
+                <p class="text-4xl font-bold text-gray-800 mt-4">{{ fontes|length if fontes else 0 }}</p>
+                <h3 class="text-lg text-gray-500 mt-2">Fontes Ativas</h3>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="display-4 text-success">
-                    <i class="fas fa-leaf"></i>
-                </div>
-                <h3 class="h5 mt-3">Impacto Ambiental</h3>
-                <p class="h2 text-success">-45.6 CO₂</p>
+            <div>
+                <i class="fas fa-leaf text-5xl text-green-500"></i>
+                <p class="text-4xl font-bold text-gray-800 mt-4">-45.6 kg CO₂</p>
+                <h3 class="text-lg text-gray-500 mt-2">Impacto Ambiental Positivo</h3>
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Smooth scroll para links da navbar
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    // Animação de fade-in para cards ao scrollar
-    window.addEventListener('scroll', function() {
-        document.querySelectorAll('.feature-card').forEach(card => {
-            const cardTop = card.getBoundingClientRect().top;
-            if (cardTop < window.innerHeight - 100) {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }
-        });
-    });
-</script>
 {% endblock %}
