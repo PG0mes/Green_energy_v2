@@ -230,19 +230,35 @@ def reivindicar_creditos():
     if not wallet_address:
         return jsonify({"success": False, "message": "Nenhuma carteira conectada."}), 403
     
-    quantidade_a_mintar = DashboardController.calcular_excedente_reivindicavel(wallet_address)
-    quantidade_a_mintar = round(quantidade_a_mintar, 4)
+    # 1. Calcula o total disponível
+    quantidade_total = DashboardController.calcular_excedente_reivindicavel(wallet_address)
+    quantidade_total = round(quantidade_total, 4)
+
+    LIMITE_POR_TRANSACAO = 100.0  # Máximo de 100 tokens por vez
+    
+    if quantidade_total > LIMITE_POR_TRANSACAO:
+        quantidade_a_mintar = LIMITE_POR_TRANSACAO
+        msg_extra = f" (Limitado a {LIMITE_POR_TRANSACAO} por transação)"
+    else:
+        quantidade_a_mintar = quantidade_total
+        msg_extra = ""
 
     if quantidade_a_mintar <= 0:
         return jsonify({"success": False, "message": "Nenhum crédito disponível."})
 
+    # Chama o mint com a quantidade limitada
     resultado_mint = mint_gec_tokens(wallet_address, quantidade_a_mintar)
     
     if resultado_mint and resultado_mint.get("success"):
         TransacaoRepository.salvar_transacao(
-            wallet_address=wallet_address, kwh_excedente=quantidade_a_mintar,
-            gec_recebido=quantidade_a_mintar, tx_hash=resultado_mint.get("tx_hash")
+            wallet_address=wallet_address, 
+            kwh_excedente=quantidade_a_mintar,
+            gec_recebido=quantidade_a_mintar, 
+            tx_hash=resultado_mint.get("tx_hash")
         )
+        # Atualiza a mensagem para avisar o usuário
+        resultado_mint['message'] += msg_extra
+        
     return jsonify(resultado_mint)
 
 @main.route('/api/fonte/<int:fonte_id>/producao-diaria')

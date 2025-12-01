@@ -7,5 +7,14 @@
         "gec_recebido": 25.8,
         "status": "Processado",
         "tx_hash": "1c0f33b3f2c554bd1e6ad17558365175dfc7c6c0140b85473fb8bc617c6cbdcd"
+    },
+    {
+        "id": 2,
+        "wallet_address": "0x054603529a4b9b04f1ce04370b42734641a90a63",
+        "data": "2025-12-01 09:10:49",
+        "kwh_excedente": 100.0,
+        "gec_recebido": 100.0,
+        "status": "Processado",
+        "tx_hash": "9a8440ea521cf0ae06a11aee65db4597d5768ce020498e58e4cab73cc4741db1"
     }
 ]
